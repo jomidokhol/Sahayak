@@ -7,7 +7,7 @@
     <style>
         * { box-sizing: border-box; }
         body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f0f2f5; margin: 0; padding: 12px; color: #333; }
-        .container { max-width: 650px; margin: 0 auto; }
+        .container { max-width: 680px; margin: 0 auto; }
         .header { background: #006A4E; color: white; text-align: center; padding: 15px; border-radius: 10px; margin-bottom: 15px; }
         .header h1 { margin: 0; font-size: 22px; }
         .header p { margin: 5px 0 0 0; font-size: 13px; opacity: 0.9; }
@@ -22,6 +22,7 @@
         button:hover { background-color: #00523d; }
         button.btn-danger { background: #dc3545; }
         button.btn-warning { background: #ffc107; color: #000; }
+        button.btn-success { background: #28a745; }
         button.btn-cancel { background: #6c757d; margin-top: 6px; }
 
         .alert { padding: 12px; border-radius: 6px; font-weight: bold; margin-bottom: 15px; display: none; text-align: center; font-size: 14px; }
@@ -45,23 +46,47 @@
 <div class="container">
     <div class="header">
         <h1>সহায়ক (Sahayak) - এডমিন ড্যাশবোর্ড</h1>
-        <p>লালপুর উপজেলা জরুরি তথ্য ও নিউজ প্যানেল</p>
+        <p>লালপুর উপজেলা জরুরি তথ্য, সংবাদ ও রিভিউ প্যানেল</p>
     </div>
 
     <!-- Alert Box -->
     <div id="alertBox" class="alert"></div>
 
-    <!-- Section 1: News Update -->
+    <!-- Section 1: Scrolling Notice Bar Update -->
     <div class="card">
-        <h2>১. এলাকার সংবাদ / জরুরি নোটিশ আপডেট</h2>
-        <label for="newsInput">বর্তমান খবর:</label>
-        <textarea id="newsInput" rows="3" placeholder="যেমন: আগামী কাল লালপুরে বিদ্যুৎ সরবরাহ বন্ধ থাকবে..."></textarea>
-        <button onclick="updateNews()">সংবাদ পাবলিশ করুন</button>
+        <h2>১. স্ক্রলিং নোটিশ আপডেট (অ্যাপের ওপরের চিকন বার)</h2>
+        <label for="newsInput">নোটিশ বার্তা:</label>
+        <textarea id="newsInput" rows="2" placeholder="যেমন: আগামী কাল লালপুরে বিদ্যুৎ সরবরাহ বন্ধ থাকবে..."></textarea>
+        <button onclick="updateNotice()">নোটিশ সেভ করুন</button>
     </div>
 
-    <!-- Section 2: Contact Form -->
+    <!-- Section 2: News Upload with Title, Image & Description -->
     <div class="card">
-        <h2 id="formTitle">২. নতুন কন্টাক্ট যোগ করুন</h2>
+        <h2>২. নতুন খবর ও ছবি কভার যোগ করুন (News & Updates Slider)</h2>
+        <label for="newsTitle">সংবাদের শিরোনাম (*):</label>
+        <input type="text" id="newsTitle" placeholder="যেমন: লালপুর হাসপাতালে নতুন অ্যাম্বুলেন্স সংযোজন">
+
+        <label for="newsImageUrl">কভার ইমেজের লিংক (Image URL):</label>
+        <input type="text" id="newsImageUrl" placeholder="যেমন: https://i.ibb.co/example.jpg">
+
+        <label for="newsDetail">সংবাদের বিস্তারিত ವಿವರণে:</label>
+        <textarea id="newsDetail" rows="4" placeholder="সংবাদের বিস্তারিত বিষয়বস্তু এখানে লিখুন..."></textarea>
+
+        <button onclick="publishNewsArticle()">খবর পাবলিশ করুন</button>
+    </div>
+
+    <!-- Section 3: Public Box Requests Review Panel -->
+    <div class="card">
+        <h2>৩. পাবলিক বক্স পোস্ট রিভিউ প্যানেল (ইউজারদের প্রশ্ন/পোস্ট)</h2>
+        <button onclick="loadPendingPublicPosts()" style="background: #2196F3; margin-bottom: 10px;">রিভিউ তালিকা রিফ্রেশ করুন 🔄</button>
+        <div id="pendingPostsContainer">
+            <p style="text-align: center; color: #777;">পেন্ডিং পোস্ট লোড হচ্ছে...</p>
+        </div>
+    </div>
+
+    <!-- Section 4: Contact Form -->
+    <div class="card">
+        <h2 id="formTitle">৪. নতুন কন্টাক্ট যোগ করুন</h2>
         <input type="hidden" id="editKey">
         
         <label for="category">ক্যাটাগরি:</label>
@@ -89,9 +114,9 @@
         <button id="cancelBtn" class="btn-cancel" onclick="resetForm()" style="display:none;">ক্যানসেল করুন</button>
     </div>
 
-    <!-- Section 3: Contact List -->
+    <!-- Section 5: Contact List -->
     <div class="card">
-        <h2>৩. সেভ করা সকল কন্টাক্ট তালিকা</h2>
+        <h2>৫. সেভ করা সকল কন্টাক্ট তালিকা</h2>
         <div id="contactsContainer">
             <p style="text-align: center; color: #777;">ডাটা লোড হচ্ছে...</p>
         </div>
@@ -99,7 +124,7 @@
 </div>
 
 <script>
-    // 🔑 আপনার দেওয়া ফায়ারবেস ওয়েব কনফিগারেশন + ডাটাবেজ ইউআরএল
+    // 🔑 ফায়ারবেস কনফিগারেশন
     const firebaseConfig = {
         apiKey: "AIzaSyDU1pxKC9sWm9BV-2HUY7646qvkPrwLXvY",
         authDomain: "sohayok-cbd50.firebaseapp.com",
@@ -115,7 +140,7 @@
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
-    // Alert Message Function
+    // Alert Notification
     function showAlert(msg, isSuccess) {
         const alertBox = document.getElementById('alertBox');
         alertBox.innerText = msg;
@@ -125,26 +150,110 @@
         setTimeout(() => { alertBox.style.display = 'none'; }, 4000);
     }
 
-    // 1. Update News Logic
-    function updateNews() {
+    // 1. Update Scrolling Notice
+    function updateNotice() {
         const news = document.getElementById('newsInput').value;
         if (!news.trim()) {
-            showAlert("মেহেরবানি করে সংবাদের তথ্য লিখুন!", false);
+            showAlert("মেহেরবানি করে নোটিশ বার্তা লিখুন!", false);
             return;
         }
         database.ref('news_update').set(news)
-            .then(() => showAlert("সংবাদ সফলভাবে আপডেট হয়েছে!", true))
+            .then(() => showAlert("নোটিশ সফলভাবে আপডেট হয়েছে!", true))
             .catch((err) => showAlert("ত্রুটি: " + err.message, false));
     }
 
-    // Fetch News on Page Load
+    // Fetch Scrolling Notice on Page Load
     database.ref('news_update').on('value', (snapshot) => {
         if (snapshot.exists()) {
             document.getElementById('newsInput').value = snapshot.val();
         }
     });
 
-    // 2. Add / Edit Contact Logic
+    // 2. Publish Full News Article with Cover Image
+    function publishNewsArticle() {
+        const title = document.getElementById('newsTitle').value;
+        const imageUrl = document.getElementById('newsImageUrl').value;
+        const desc = document.getElementById('newsDetail').value;
+
+        if (!title.trim()) {
+            showAlert("সংবাদের শিরোনাম দেওয়া আবশ্যক!", false);
+            return;
+        }
+
+        const newsRef = database.ref('news_list').push();
+        newsRef.set({
+            id: newsRef.key,
+            title: title,
+            imageUrl: imageUrl,
+            desc: desc,
+            timestamp: Date.now()
+        })
+        .then(() => {
+            showAlert("সংবাদটি সফলভাবে নিউজ ফিডে সেভ হয়েছে!", true);
+            document.getElementById('newsTitle').value = '';
+            document.getElementById('newsImageUrl').value = '';
+            document.getElementById('newsDetail').value = '';
+        })
+        .catch((err) => showAlert("ত্রুটি: " + err.message, false));
+    }
+
+    // 3. Load Pending Public Box Posts for Review
+    function loadPendingPublicPosts() {
+        const container = document.getElementById('pendingPostsContainer');
+        container.innerHTML = '<p style="text-align: center; color: #777;">লোড হচ্ছে...</p>';
+
+        database.ref('public_posts').on('value', (snapshot) => {
+            container.innerHTML = '';
+            if (!snapshot.exists()) {
+                container.innerHTML = '<p style="text-align: center; color: #777;">কোনো পেন্ডিং পোস্ট বা প্রশ্ন নেই।</p>';
+                return;
+            }
+
+            let pendingCount = 0;
+            snapshot.forEach((childSnapshot) => {
+                const key = childSnapshot.key;
+                const post = childSnapshot.val();
+
+                if (post.isApproved === false) {
+                    pendingCount++;
+                    const card = document.createElement('div');
+                    card.className = 'item-card';
+                    card.innerHTML = `
+                        <h4>লেখক: ${escapeHtml(post.userName || 'অজ্ঞাত ইউজার')}</h4>
+                        <p><strong>বক্তব্য/প্রশ্ন:</strong> ${escapeHtml(post.content)}</p>
+                        <p><small>সময়: ${new Date(post.timestamp || Date.now()).toLocaleString('bn-BD')}</small></p>
+                        <div class="btn-group">
+                            <button class="btn-success" onclick="approvePost('${key}')">অনুমোদন করুন (Accept)</button>
+                            <button class="btn-danger" onclick="declinePost('${key}')">বাতিল করুন (Decline)</button>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                }
+            });
+
+            if (pendingCount === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #777;">কোনো পেন্ডিং রিভিউ পোস্ট নেই।</p>';
+            }
+        });
+    }
+
+    // Accept Public Post
+    function approvePost(key) {
+        database.ref('public_posts/' + key).update({ isApproved: true })
+            .then(() => showAlert("পোস্টটি সফলভাবে অনুমোদন (Approved) করা হয়েছে!", true))
+            .catch((err) => showAlert("ত্রুটি: " + err.message, false));
+    }
+
+    // Decline/Delete Public Post
+    function declinePost(key) {
+        if (confirm("আপনি কি নিশ্চিত যে পোস্টটি বাতিল ও মুছে ফেলতে চান?")) {
+            database.ref('public_posts/' + key).remove()
+                .then(() => showAlert("পোস্টটি মুছে ফেলা হয়েছে!", true))
+                .catch((err) => showAlert("ত্রুটি: " + err.message, false));
+        }
+    }
+
+    // 4. Add / Edit Contact Logic
     function saveContact() {
         const editKey = document.getElementById('editKey').value;
         const category = document.getElementById('category').value;
@@ -161,7 +270,6 @@
         const data = { category, name, title, phone, location };
 
         if (editKey) {
-            // Update Existing Contact
             database.ref('contacts/' + editKey).update(data)
                 .then(() => {
                     showAlert("কন্টাক্ট সফলভাবে আপডেট হয়েছে!", true);
@@ -169,7 +277,6 @@
                 })
                 .catch((err) => showAlert("ত্রুটি: " + err.message, false));
         } else {
-            // Push New Contact
             const newRef = database.ref('contacts').push();
             data.id = newRef.key;
             newRef.set(data)
@@ -181,7 +288,7 @@
         }
     }
 
-    // 3. Listen and Render Contacts List
+    // 5. Listen and Render Contacts List
     database.ref('contacts').on('value', (snapshot) => {
         const container = document.getElementById('contactsContainer');
         container.innerHTML = '';
@@ -213,7 +320,6 @@
         });
     });
 
-    // Populate Form for Edit
     function editContact(key, category, name, title, phone, location) {
         document.getElementById('editKey').value = key;
         document.getElementById('category').value = category;
@@ -225,10 +331,9 @@
         document.getElementById('formTitle').innerText = "কন্টাক্ট এডিট করুন";
         document.getElementById('saveBtn').innerText = "আপডেট করুন";
         document.getElementById('cancelBtn').style.display = "block";
-        window.scrollTo({ top: 200, behavior: 'smooth' });
+        window.scrollTo({ top: 300, behavior: 'smooth' });
     }
 
-    // Reset Form
     function resetForm() {
         document.getElementById('editKey').value = '';
         document.getElementById('name').value = '';
@@ -236,12 +341,11 @@
         document.getElementById('phone').value = '';
         document.getElementById('location').value = '';
 
-        document.getElementById('formTitle').innerText = "২. নতুন কন্টাক্ট যোগ করুন";
+        document.getElementById('formTitle').innerText = "৪. নতুন কন্টাক্ট যোগ করুন";
         document.getElementById('saveBtn').innerText = "কন্টাক্ট সেভ করুন";
         document.getElementById('cancelBtn').style.display = "none";
     }
 
-    // Delete Contact
     function deleteContact(key) {
         if (confirm("আপনি কি নিশ্চিত যে এই কন্টাক্টটি মুছে ফেলতে চান?")) {
             database.ref('contacts/' + key).remove()
@@ -250,7 +354,6 @@
         }
     }
 
-    // Helper Category Name
     function getCategoryName(cat) {
         const categories = {
             'doctor': 'ডাক্তার ও হাসপাতাল',
@@ -268,6 +371,11 @@
     function escapeJs(str) {
         return (str || '').replace(/'/g, "\\'").replace(/"/g, '\\"');
     }
+
+    // Page Load Setup
+    window.onload = function() {
+        loadPendingPublicPosts();
+    };
 </script>
 
 </body>
