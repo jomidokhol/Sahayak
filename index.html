@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>সহায়ক - লালপুর এডমিন প্যানেল</title>
+    <title>সহায়ক - লালপুর এডমিন প্যানেল (Firestore Native)</title>
     <style>
         * { box-sizing: border-box; }
         body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f0f2f5; margin: 0; padding: 12px; color: #333; }
@@ -37,21 +37,22 @@
         .badge { display: inline-block; background: #e8f5e9; color: #2e7d32; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; margin-bottom: 4px; }
     </style>
 
+    <!-- Firebase SDK Compat for Cloud Firestore -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
 
 <div class="container">
     <div class="header">
-        <h1>সহায়ক (Sahayak) - এডমিন ড্যাশবোর্ড</h1>
+        <h1>সহায়ক (Sahayak) - ফায়ারস্টোর এডমিন ড্যাশবোর্ড</h1>
         <p>লালপুর উপজেলা জরুরি তথ্য, সংবাদ ও রিভিউ প্যানেল</p>
     </div>
 
     <!-- Alert Box -->
     <div id="alertBox" class="alert"></div>
 
-    <!-- Section 1: Notice -->
+    <!-- Section 1: Scrolling Notice Bar Update -->
     <div class="card">
         <h2>১. স্ক্রলিং নোটিশ আপডেট (অ্যাপের ওপরের চিকন বার)</h2>
         <label for="newsInput">নোটিশ বার্তা:</label>
@@ -74,12 +75,12 @@
         <button onclick="publishNewsArticle()">খবর পাবলিশ করুন</button>
     </div>
 
-    <!-- Section 3: Public Box Review -->
+    <!-- Section 3: Public Box Requests Review -->
     <div class="card">
-        <h2>৩. পাবলিক বক্স পোস্ট রিভিউ প্যানেল</h2>
-        <button onclick="loadPendingPublicPosts()" style="background: #2196F3; margin-bottom: 10px;">রিভিউ তালিকা রিফ্রেশ করুন 🔄</button>
+        <h2>৩. পাবলিক বক্স পোস্ট প্যানেল</h2>
+        <button onclick="loadPublicPosts()" style="background: #2196F3; margin-bottom: 10px;">পোস্ট তালিকা রিফ্রেশ করুন 🔄</button>
         <div id="pendingPostsContainer">
-            <p style="text-align: center; color: #777;">পেন্ডিং পোস্ট লোড হচ্ছে...</p>
+            <p style="text-align: center; color: #777;">পোস্ট লোড হচ্ছে...</p>
         </div>
     </div>
 
@@ -107,6 +108,7 @@
             <option value="gas">গ্যাস সেবা</option>
             <option value="ambulance">অ্যাম্বুলেন্স</option>
             <option value="courier">কুরিয়ার</option>
+            <option value="fuel">তেল পাম্প ও পেট্রোল</option>
             <option value="other">অন্যান্য সেবা</option>
         </select>
 
@@ -154,7 +156,7 @@
     };
 
     firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
+    const db = firebase.firestore();
 
     function showAlert(msg, isSuccess) {
         const alertBox = document.getElementById('alertBox');
@@ -165,20 +167,26 @@
         setTimeout(() => { alertBox.style.display = 'none'; }, 4000);
     }
 
+    // 1. Update Notice in Firestore
     function updateNotice() {
-        const news = document.getElementById('newsInput').value;
-        if (!news.trim()) return showAlert("নোটিশ বার্তা লিখুন!", false);
-        database.ref('news_update').set(news)
-            .then(() => showAlert("নোটিশ সফলভাবে আপডেট হয়েছে!", true))
-            .catch((err) => showAlert("ত্রুটি: " + err.message, false));
+        const text = document.getElementById('newsInput').value;
+        if (!text.trim()) return showAlert("নোটিশ বার্তা লিখুন!", false);
+
+        db.collection('settings').doc('notice').set({
+            text: text,
+            updatedAt: firebase.firestore.Timestamp.now()
+        })
+        .then(() => showAlert("নোটিশ সফলভাবে সেভ হয়েছে!", true))
+        .catch((err) => showAlert("ত্রুটি: " + err.message, false));
     }
 
-    database.ref('news_update').on('value', (snapshot) => {
-        if (snapshot.exists()) {
-            document.getElementById('newsInput').value = snapshot.val();
+    db.collection('settings').doc('notice').onSnapshot(doc => {
+        if (doc.exists) {
+            document.getElementById('newsInput').value = doc.data().text || '';
         }
     });
 
+    // 2. Publish News Article in Firestore
     function publishNewsArticle() {
         const title = document.getElementById('newsTitle').value;
         const imageUrl = document.getElementById('newsImageUrl').value;
@@ -186,16 +194,14 @@
 
         if (!title.trim()) return showAlert("সংবাদের শিরোনাম দেওয়া আবশ্যক!", false);
 
-        const newsRef = database.ref('news_list').push();
-        newsRef.set({
-            id: newsRef.key,
+        db.collection('news_list').add({
             title: title,
             imageUrl: imageUrl,
             desc: desc,
-            timestamp: Date.now()
+            timestamp: firebase.firestore.Timestamp.now()
         })
         .then(() => {
-            showAlert("সংবাদটি সফলভাবে নিউজ কভারে সেভ হয়েছে!", true);
+            showAlert("সংবাদটি সফলভাবে ফায়ারস্টোরে সেভ হয়েছে!", true);
             document.getElementById('newsTitle').value = '';
             document.getElementById('newsImageUrl').value = '';
             document.getElementById('newsDetail').value = '';
@@ -203,64 +209,47 @@
         .catch((err) => showAlert("ত্রুটি: " + err.message, false));
     }
 
-    function loadPendingPublicPosts() {
+    // 3. Load Public Box Posts from Firestore
+    function loadPublicPosts() {
         const container = document.getElementById('pendingPostsContainer');
         container.innerHTML = '<p style="text-align: center; color: #777;">লোড হচ্ছে...</p>';
 
-        database.ref('users').on('value', (snapshot) => {
+        db.collection('public_box').onSnapshot(snapshot => {
             container.innerHTML = '';
-            if (!snapshot.exists()) {
-                container.innerHTML = '<p style="text-align: center; color: #777;">কোনো পেন্ডিং পোস্ট বা প্রশ্ন নেই।</p>';
+            if (snapshot.empty) {
+                container.innerHTML = '<p style="text-align: center; color: #777;">কোনো পোস্ট নেই।</p>';
                 return;
             }
 
-            let pendingCount = 0;
-            snapshot.forEach((userSnapshot) => {
-                const userUid = userSnapshot.key;
-                const postsSnapshot = userSnapshot.child('posts');
+            snapshot.forEach(doc => {
+                const post = doc.data();
+                const key = doc.id;
+                const timeStr = post.timestamp ? new Date(post.timestamp.toDate()).toLocaleString('bn-BD') : 'এখন';
 
-                postsSnapshot.forEach((postSnapshot) => {
-                    const postKey = postSnapshot.key;
-                    const post = postSnapshot.val();
-
-                    if (post && post.isApproved === false) {
-                        pendingCount++;
-                        const card = document.createElement('div');
-                        card.className = 'item-card';
-                        card.innerHTML = `
-                            <h4>লেখক: ${escapeHtml(post.userName || 'ইউজার')}</h4>
-                            <p><strong>বক্তব্য/প্রশ্ন:</strong> ${escapeHtml(post.content)}</p>
-                            <p><small>সময়: ${new Date(post.timestamp || Date.now()).toLocaleString('bn-BD')}</small></p>
-                            <div class="btn-group">
-                                <button class="btn-success" onclick="approvePost('${userUid}', '${postKey}')">অনুমোদন করুন (Accept)</button>
-                                <button class="btn-danger" onclick="declinePost('${userUid}', '${postKey}')">বাতিল করুন (Decline)</button>
-                            </div>
-                        `;
-                        container.appendChild(card);
-                    }
-                });
+                const card = document.createElement('div');
+                card.className = 'item-card';
+                card.innerHTML = `
+                    <h4>লেখক: ${escapeHtml(post.userName || 'ইউজার')}</h4>
+                    <p><strong>বক্তব্য/প্রশ্ন:</strong> ${escapeHtml(post.content)}</p>
+                    <p><small>সময়: ${timeStr}</small></p>
+                    <div class="btn-group">
+                        <button class="btn-danger" style="width:100%;" onclick="deletePost('${key}')">পোস্ট মুছে ফেলুন (Delete)</button>
+                    </div>
+                `;
+                container.appendChild(card);
             });
-
-            if (pendingCount === 0) {
-                container.innerHTML = '<p style="text-align: center; color: #777;">কোনো পেন্ডিং রিভিউ পোস্ট নেই।</p>';
-            }
         });
     }
 
-    function approvePost(userUid, postKey) {
-        database.ref(`users/${userUid}/posts/${postKey}`).update({ isApproved: true })
-            .then(() => showAlert("পোস্টটি সফলভাবে অনুমোদন করা হয়েছে!", true))
-            .catch((err) => showAlert("ত্রুটি: " + err.message, false));
-    }
-
-    function declinePost(userUid, postKey) {
-        if (confirm("আপনি কি নিশ্চিত যে পোস্টটি বাতিল করতে চান?")) {
-            database.ref(`users/${userUid}/posts/${postKey}`).remove()
+    function deletePost(key) {
+        if (confirm("আপনি কি নিশ্চিত যে পোস্টটি মুছে ফেলতে চান?")) {
+            db.collection('public_box').doc(key).delete()
                 .then(() => showAlert("পোস্টটি মুছে ফেলা হয়েছে!", true))
                 .catch((err) => showAlert("ত্রুটি: " + err.message, false));
         }
     }
 
+    // 4. Save Contacts in Firestore
     function saveContact() {
         const editKey = document.getElementById('editKey').value;
         const category = document.getElementById('category').value;
@@ -276,29 +265,28 @@
         const data = { category, name, title, phone, location, whatsapp, facebook };
 
         if (editKey) {
-            database.ref('contacts/' + editKey).update(data)
+            db.collection('contacts').doc(editKey).update(data)
                 .then(() => { showAlert("কন্টাক্ট সফলভাবে আপডেট হয়েছে!", true); resetForm(); })
                 .catch((err) => showAlert("ত্রুটি: " + err.message, false));
         } else {
-            const newRef = database.ref('contacts').push();
-            data.id = newRef.key;
-            newRef.set(data)
-                .then(() => { showAlert("নতুন কন্টাক্ট সফলভাবে সেভ হয়েছে!", true); resetForm(); })
+            db.collection('contacts').add(data)
+                .then(() => { showAlert("নতুন কন্টাক্ট ফায়ারস্টোরে সেভ হয়েছে!", true); resetForm(); })
                 .catch((err) => showAlert("ত্রুটি: " + err.message, false));
         }
     }
 
-    database.ref('contacts').on('value', (snapshot) => {
+    // Render Contacts
+    db.collection('contacts').onSnapshot(snapshot => {
         const container = document.getElementById('contactsContainer');
         container.innerHTML = '';
-        if (!snapshot.exists()) {
+        if (snapshot.empty) {
             container.innerHTML = '<p style="text-align: center; color: #777;">এখনো কোনো কন্টাক্ট যোগ করা হয়নি।</p>';
             return;
         }
 
-        snapshot.forEach((childSnapshot) => {
-            const key = childSnapshot.key;
-            const item = childSnapshot.val();
+        snapshot.forEach(doc => {
+            const key = doc.id;
+            const item = doc.data();
 
             const card = document.createElement('div');
             card.className = 'item-card';
@@ -309,8 +297,6 @@
                 <p><strong>বিবরণ:</strong> ${escapeHtml(item.title || 'N/A')}</p>
                 <p><strong>মোবাইল:</strong> ${escapeHtml(item.phone)}</p>
                 <p><strong>ঠিকানা:</strong> ${escapeHtml(item.location || 'N/A')}</p>
-                ${item.whatsapp ? `<p><strong>WhatsApp:</strong> ${escapeHtml(item.whatsapp)}</p>` : ''}
-                ${item.facebook ? `<p><strong>Facebook:</strong> ${escapeHtml(item.facebook)}</p>` : ''}
                 <div class="btn-group">
                     <button class="btn-warning" onclick="editContact('${key}', '${escapeJs(item.category)}', '${escapeJs(item.name)}', '${escapeJs(item.title)}', '${escapeJs(item.phone)}', '${escapeJs(item.location)}', '${escapeJs(item.whatsapp || '')}', '${escapeJs(item.facebook || '')}')">এডিট</button>
                     <button class="btn-danger" onclick="deleteContact('${key}')">মুছে ফেলুন</button>
@@ -352,8 +338,8 @@
 
     function deleteContact(key) {
         if (confirm("আপনি কি নিশ্চিত যে এটি মুছে ফেলতে চান?")) {
-            database.ref('contacts/' + key).remove()
-                .then(() => showAlert("কন্টাক্ট সফলভাবে মুছে ফেলা হয়েছে!", true))
+            db.collection('contacts').doc(key).delete()
+                .then(() => showAlert("কন্টাক্ট মুছে ফেলা হয়েছে!", true))
                 .catch((err) => showAlert("ত্রুটি: " + err.message, false));
         }
     }
@@ -386,8 +372,566 @@
     function escapeHtml(str) { return (str || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
     function escapeJs(str) { return (str || '').replace(/'/g, "\\'").replace(/"/g, '\\"'); }
 
-    window.onload = function() { loadPendingPublicPosts(); };
+    window.onload = function() { loadPublicPosts(); };
 </script>
 
 </body>
 </html>
+EOF
+
+# 2. Update Android App to Native Firestore Timestamp & Full Firestore Synchronization
+cat << 'EOF' > app/src/main/java/com/nur/sahayak/CreatePostActivity.kt
+package com.nur.sahayak
+
+import android.content.Context
+import android.graphics.Color
+import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.text.Editable
+import android.text.TextWatcher
+import android.util.Log
+import android.widget.Button
+import android.widget.EditText
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.chip.ChipGroup
+import com.google.firebase.Timestamp
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.nur.sahayak.utils.TopNotification
+
+class CreatePostActivity : AppCompatActivity() {
+
+    private val maxWordLimit = 1001
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_create_post)
+
+        val chipGroupExpiry = findViewById<ChipGroup>(R.id.chipGroupExpiry)
+        val etContent = findViewById<EditText>(R.id.etPostContent)
+        val tvWordCounter = findViewById<TextView>(R.id.tvWordCounter)
+        val btnSubmit = findViewById<Button>(R.id.btnSubmitPost)
+
+        val sharedPref = getSharedPreferences("user_session", Context.MODE_PRIVATE)
+        val authUid = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+        val prefUid = sharedPref.getString("user_uid", "") ?: ""
+        val finalUid = if (authUid.isNotEmpty()) authUid else if (prefUid.isNotEmpty()) prefUid else "user_${System.currentTimeMillis()}"
+        val userName = sharedPref.getString("user_name", "লালপুরবাসী") ?: "লালপুরবাসী"
+
+        etContent.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                val text = s.toString().trim()
+                val wordCount = if (text.isEmpty()) 0 else text.split(Regex("\\s+")).size
+                tvWordCounter.text = "শব্দ সংখ্যা: $wordCount / $maxWordLimit"
+
+                if (wordCount > maxWordLimit) {
+                    tvWordCounter.setTextColor(Color.RED)
+                    btnSubmit.isEnabled = false
+                } else {
+                    tvWordCounter.setTextColor(Color.parseColor("#666666"))
+                    btnSubmit.isEnabled = true
+                }
+            }
+            override fun afterTextChanged(s: Editable?) {}
+        })
+
+        btnSubmit.setOnClickListener {
+            val content = etContent.text.toString().trim()
+            val wordCount = if (content.isEmpty()) 0 else content.split(Regex("\\s+")).size
+
+            if (content.isEmpty()) {
+                Toast.makeText(this, "পোস্টের বক্তব্য লিখুন", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (wordCount > maxWordLimit) {
+                Toast.makeText(this, "শব্দ সংখ্যা ১০০১ এর বেশি হতে পারবে না", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            btnSubmit.isEnabled = false
+            val nowTimestamp = Timestamp.now()
+            val secondsToAdd = when (chipGroupExpiry.checkedChipId) {
+                R.id.chip7Days -> 7 * 24 * 60 * 60L
+                R.id.chip30Days -> 30L * 24 * 60 * 60L
+                else -> 24 * 60 * 60L
+            }
+            val expiryTimestamp = Timestamp(nowTimestamp.seconds + secondsToAdd, 0)
+
+            val firestore = FirebaseFirestore.getInstance()
+            val newDocRef = firestore.collection("public_box").document()
+            val postId = newDocRef.id
+
+            val postMap = hashMapOf<String, Any>(
+                "id" to postId,
+                "userId" to finalUid,
+                "userName" to userName,
+                "content" to content,
+                "timestamp" to nowTimestamp,
+                "expiryTimestamp" to expiryTimestamp,
+                "likesCount" to 0,
+                "repliesCount" to 0,
+                "isApproved" to true
+            )
+
+            // Direct Native Timestamp Write
+            newDocRef.set(postMap).addOnSuccessListener {
+                if (finalUid.isNotEmpty()) {
+                    firestore.collection("users").document(finalUid)
+                        .collection("posts").document(postId).set(postMap)
+                }
+                TopNotification.show(this, "আপনার পোস্টটি ফায়ারস্টোরে সরাসরি সফলভাবে প্রকাশিত হয়েছে!")
+                Handler(Looper.getMainLooper()).postDelayed({
+                    finish()
+                }, 1500)
+            }.addOnFailureListener { err ->
+                btnSubmit.isEnabled = true
+                Toast.makeText(this, "পোস্ট ব্যর্থ: ${err.message}", Toast.LENGTH_LONG).show()
+                Log.e("CreatePostActivity", "Firestore write failed", err)
+            }
+        }
+    }
+}
+EOF
+
+# 3. Update MainActivity.kt to Listen to Firestore Settings Notice & Contacts
+cat << 'EOF' > app/src/main/java/com/nur/sahayak/MainActivity.kt
+package com.nur.sahayak
+
+import android.content.Context
+import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Color
+import android.graphics.drawable.BitmapDrawable
+import android.os.Bundle
+import android.util.Log
+import android.view.View
+import android.widget.ImageButton
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.nur.sahayak.fragments.HomeFragment
+import com.nur.sahayak.fragments.NewsFragment
+import com.nur.sahayak.fragments.ProfileFragment
+import com.nur.sahayak.fragments.ServicesFragment
+
+class MainActivity : AppCompatActivity() {
+
+    private lateinit var tvNoticeText: TextView
+    private lateinit var btnHeaderLogin: MaterialButton
+    private lateinit var btnHeaderAddPost: ImageButton
+    private lateinit var bottomNav: BottomNavigationView
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        try {
+            setContentView(R.layout.activity_main)
+
+            window.statusBarColor = Color.TRANSPARENT
+            window.decorView.systemUiVisibility = (
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+            )
+
+            bottomNav = findViewById(R.id.bottomNavigation)
+            bottomNav.itemIconTintList = null
+
+            val noticeBar = findViewById<LinearLayout>(R.id.noticeBar)
+            val btnCloseNotice = findViewById<ImageView>(R.id.btnCloseNotice)
+            tvNoticeText = findViewById(R.id.tvNoticeText)
+            val btnHeaderSearch = findViewById<ImageButton>(R.id.btnHeaderSearch)
+            btnHeaderAddPost = findViewById(R.id.btnHeaderAddPost)
+            btnHeaderLogin = findViewById(R.id.btnHeaderLogin)
+
+            tvNoticeText.isSelected = true
+
+            loadFirestoreNotice()
+
+            btnCloseNotice.setOnClickListener {
+                noticeBar.visibility = View.GONE
+            }
+
+            btnHeaderSearch.setOnClickListener {
+                bottomNav.selectedItemId = R.id.nav_services
+            }
+
+            btnHeaderAddPost.setOnClickListener {
+                startActivity(Intent(this, CreatePostActivity::class.java))
+            }
+
+            btnHeaderLogin.setOnClickListener {
+                startActivity(Intent(this, LoginActivity::class.java))
+            }
+
+            if (savedInstanceState == null) {
+                loadFragment(HomeFragment(), "HOME")
+            }
+
+            supportFragmentManager.addOnBackStackChangedListener {
+                try {
+                    val currentFragment = supportFragmentManager.findFragmentById(R.id.fragmentContainer)
+                    when (currentFragment) {
+                        is HomeFragment -> bottomNav.menu.findItem(R.id.nav_home).isChecked = true
+                        is ServicesFragment -> bottomNav.menu.findItem(R.id.nav_services).isChecked = true
+                        is NewsFragment -> bottomNav.menu.findItem(R.id.nav_news).isChecked = true
+                        is ProfileFragment -> bottomNav.menu.findItem(R.id.nav_auth).isChecked = true
+                    }
+                } catch (e: Exception) {
+                    Log.e("MainActivity", "BackStack sync error", e)
+                }
+            }
+
+            bottomNav.setOnItemSelectedListener { item ->
+                when (item.itemId) {
+                    R.id.nav_home -> loadFragment(HomeFragment(), "HOME")
+                    R.id.nav_services -> loadFragment(ServicesFragment(), "SERVICES")
+                    R.id.nav_news -> loadFragment(NewsFragment(), "NEWS")
+                    R.id.nav_auth -> {
+                        val sharedPref = getSharedPreferences("user_session", Context.MODE_PRIVATE)
+                        val isLoggedIn = sharedPref.getBoolean("is_logged_in", false)
+                        if (isLoggedIn) {
+                            loadFragment(ProfileFragment(), "PROFILE")
+                        } else {
+                            startActivity(Intent(this, LoginActivity::class.java))
+                            false
+                        }
+                    }
+                    else -> false
+                }
+            }
+
+            onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    try {
+                        val currentFragment = supportFragmentManager.findFragmentById(R.id.fragmentContainer)
+                        if (currentFragment !is HomeFragment) {
+                            bottomNav.selectedItemId = R.id.nav_home
+                        } else {
+                            finish()
+                        }
+                    } catch (e: Exception) {
+                        finish()
+                    }
+                }
+            })
+
+        } catch (e: Exception) {
+            Log.e("MainActivity", "Fatal Inflation Error", e)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        try {
+            updateAuthState()
+        } catch (e: Exception) {
+            Log.e("MainActivity", "Error updating auth state", e)
+        }
+    }
+
+    private fun updateAuthState() {
+        val sharedPref = getSharedPreferences("user_session", Context.MODE_PRIVATE)
+        val isLoggedIn = sharedPref.getBoolean("is_logged_in", false)
+
+        val menu = bottomNav.menu
+        val authItem = menu.findItem(R.id.nav_auth)
+
+        if (isLoggedIn) {
+            btnHeaderLogin.visibility = View.GONE
+            btnHeaderAddPost.visibility = View.VISIBLE
+            authItem.title = "প্রোফাইল"
+
+            val photoUrl = FirebaseAuth.getInstance().currentUser?.photoUrl
+            val avatarSource: Any = photoUrl ?: try {
+                R.drawable.draft_user
+            } catch (e: Exception) {
+                R.drawable.ic_profile
+            }
+
+            Glide.with(this)
+                .asBitmap()
+                .load(avatarSource)
+                .circleCrop()
+                .into(object : CustomTarget<Bitmap>(64, 64) {
+                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                        authItem.icon = BitmapDrawable(resources, resource)
+                    }
+                    override fun onLoadCleared(placeholder: android.graphics.drawable.Drawable?) {}
+                })
+
+        } else {
+            btnHeaderLogin.visibility = View.VISIBLE
+            btnHeaderAddPost.visibility = View.GONE
+            authItem.setIcon(R.drawable.ic_login)
+            authItem.title = "লগইন"
+        }
+    }
+
+    private fun loadFirestoreNotice() {
+        try {
+            val firestore = FirebaseFirestore.getInstance()
+            firestore.collection("settings").document("notice")
+                .addSnapshotListener { snapshot, _ ->
+                    try {
+                        val notice = snapshot?.getString("text")
+                        tvNoticeText.text = notice ?: "লালপুর উপজেলায় আপনাকে স্বাগতম!"
+                    } catch (e: Exception) {
+                        tvNoticeText.text = "লালপুর উপজেলায় আপনাকে স্বাগতম!"
+                    }
+                }
+        } catch (e: Exception) {
+            tvNoticeText.text = "লালপুর উপজেলায় আপনাকে স্বাগতম!"
+        }
+    }
+
+    private fun loadFragment(fragment: Fragment, tag: String): Boolean {
+        return try {
+            val current = supportFragmentManager.findFragmentById(R.id.fragmentContainer)
+            if (current?.javaClass == fragment.javaClass) return false
+
+            val transaction = supportFragmentManager.beginTransaction()
+                .replace(R.id.fragmentContainer, fragment, tag)
+
+            if (fragment !is HomeFragment) {
+                transaction.addToBackStack(tag)
+            } else {
+                supportFragmentManager.popBackStack(null, androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE)
+            }
+
+            transaction.commit()
+            true
+        } catch (e: Exception) {
+            Log.e("MainActivity", "Fragment transaction error", e)
+            false
+        }
+    }
+}
+EOF
+
+# 4. Update ServicesFragment.kt to Read Contacts from Firestore
+cat << 'EOF' > app/src/main/java/com/nur/sahayak/fragments/ServicesFragment.kt
+package com.nur.sahayak.fragments
+
+import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.EditText
+import android.widget.LinearLayout
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.firebase.firestore.FirebaseFirestore
+import com.nur.sahayak.ContactItem
+import com.nur.sahayak.R
+import com.nur.sahayak.adapters.ContactAdapter
+
+class ServicesFragment : Fragment() {
+
+    companion object {
+        var initialCategory: String = "all"
+    }
+
+    private lateinit var rvContacts: RecyclerView
+    private lateinit var etSearch: EditText
+    private lateinit var swipeRefresh: SwipeRefreshLayout
+    private lateinit var btnFilterDropdown: MaterialButton
+    private lateinit var llEmptyState: LinearLayout
+    private lateinit var adapter: ContactAdapter
+
+    private var allContacts = mutableListOf<ContactItem>()
+    private var selectedCategory: String = "all"
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+    ): View? {
+        val view = inflater.inflate(R.layout.fragment_services, container, false)
+
+        rvContacts = view.findViewById(R.id.rvContacts)
+        etSearch = view.findViewById(R.id.etSearch)
+        swipeRefresh = view.findViewById(R.id.swipeRefreshServices)
+        btnFilterDropdown = view.findViewById(R.id.btnFilterDropdown)
+        llEmptyState = view.findViewById(R.id.llEmptyState)
+
+        rvContacts.layoutManager = LinearLayoutManager(context)
+        adapter = ContactAdapter(allContacts)
+        rvContacts.adapter = adapter
+
+        if (initialCategory.isNotEmpty()) {
+            selectedCategory = initialCategory
+            btnFilterDropdown.text = "ফিল্টার: ${getCategoryTitle(selectedCategory)} ▾"
+            initialCategory = "all"
+        }
+
+        fetchFirestoreContacts()
+
+        swipeRefresh.setOnRefreshListener {
+            fetchFirestoreContacts()
+        }
+
+        etSearch.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                applyFilter()
+            }
+            override fun afterTextChanged(s: Editable?) {}
+        })
+
+        btnFilterDropdown.setOnClickListener {
+            showFilterDialog()
+        }
+
+        return view
+    }
+
+    private fun showFilterDialog() {
+        val categoriesMap = linkedMapOf(
+            "all" to "সকল সেবা",
+            "doctor" to "ডাক্তার",
+            "hospital" to "হাসপাতাল",
+            "police" to "পুলিশ স্টেশন",
+            "fire" to "ফায়ার সার্ভিস",
+            "mechanic" to "মেকানিক ও গ্যারেজ",
+            "electronics" to "ইলেকট্রনিক্স",
+            "mobile" to "মোবাইল সার্ভিস",
+            "grocery" to "মুদি খানা",
+            "pharmacy" to "ফার্মেসি",
+            "diagnostic" to "ডায়াগনস্টিক",
+            "computer" to "কম্পিউটার",
+            "hotel" to "হোটেল",
+            "restaurant" to "রেস্টুরেন্ট",
+            "petrol" to "পেট্রোল পাম্প",
+            "gas" to "গ্যাস সেবা",
+            "ambulance" to "অ্যাম্বুলেন্স",
+            "courier" to "কুরিয়ার",
+            "other" to "অন্যান্য"
+        )
+
+        val titles = categoriesMap.values.toTypedArray()
+
+        MaterialAlertDialogBuilder(requireContext(), R.style.CustomDialogTheme)
+            .setTitle("সেবার ক্যাটাগরি নির্বাচন করুন")
+            .setItems(titles) { _, which ->
+                val selectedKey = categoriesMap.keys.elementAt(which)
+                val selectedTitle = titles[which]
+                selectedCategory = selectedKey
+                btnFilterDropdown.text = "ফিল্টার: $selectedTitle ▾"
+                applyFilter()
+            }
+            .show()
+    }
+
+    private fun fetchFirestoreContacts() {
+        swipeRefresh.isRefreshing = true
+        val firestore = FirebaseFirestore.getInstance()
+
+        firestore.collection("contacts").addSnapshotListener { snapshot, error ->
+            if (error != null || snapshot == null) {
+                swipeRefresh.isRefreshing = false
+                return@addSnapshotListener
+            }
+
+            allContacts.clear()
+            for (doc in snapshot.documents) {
+                val item = ContactItem(
+                    id = doc.id,
+                    category = doc.getString("category") ?: "",
+                    name = doc.getString("name") ?: "",
+                    title = doc.getString("title") ?: "",
+                    phone = doc.getString("phone") ?: "",
+                    location = doc.getString("location") ?: "",
+                    whatsapp = doc.getString("whatsapp") ?: "",
+                    facebook = doc.getString("facebook") ?: ""
+                )
+                allContacts.add(item)
+            }
+            applyFilter()
+            swipeRefresh.isRefreshing = false
+        }
+    }
+
+    private fun applyFilter() {
+        val query = etSearch.text.toString().trim()
+
+        val filteredList = allContacts.filter { item ->
+            val matchesCategory = if (selectedCategory == "all") true else item.category.equals(selectedCategory, ignoreCase = true)
+            val matchesQuery = query.isEmpty() ||
+                    item.name.contains(query, ignoreCase = true) ||
+                    item.title.contains(query, ignoreCase = true) ||
+                    item.location.contains(query, ignoreCase = true)
+
+            matchesCategory && matchesQuery
+        }
+
+        adapter.updateList(filteredList)
+
+        if (filteredList.isEmpty()) {
+            llEmptyState.visibility = View.VISIBLE
+            rvContacts.visibility = View.GONE
+        } else {
+            llEmptyState.visibility = View.GONE
+            rvContacts.visibility = View.VISIBLE
+        }
+    }
+
+    private fun getCategoryTitle(cat: String): String {
+        return when (cat) {
+            "doctor" -> "ডাক্তার"
+            "hospital" -> "হাসপাতাল"
+            "police" -> "পুলিশ স্টেশন"
+            "fire" -> "ফায়ার সার্ভিস"
+            "mechanic" -> "মেকানিক"
+            "electronics" -> "ইলেকট্রনিক্স"
+            "mobile" -> "মোবাইল সার্ভিস"
+            "grocery" -> "মুদি খানা"
+            "pharmacy" -> "ফার্মেসি"
+            "diagnostic" -> "ডায়াগনস্টিক"
+            "computer" -> "কম্পিউটার"
+            "hotel" -> "হোটেল"
+            "restaurant" -> "রেস্টুরেন্ট"
+            "petrol" -> "পেট্রোল পাম্প"
+            "gas" -> "গ্যাস সেবা"
+            "ambulance" -> "অ্যাম্বুলেন্স"
+            "courier" -> "কুরিয়ার"
+            else -> "সকল সেবা"
+        }
+    }
+}
+EOF
+
+# 5. Build Final Firestore Unified Release APK
+./gradlew assembleDebug > build.log 2>&1
+
+if [ $? -eq 0 ]; then
+    cp app/build/outputs/apk/debug/app-debug.apk ./Sahayak-FirestoreUnified-Release.apk
+    cp app/build/outputs/apk/debug/app-debug.apk ./Sahayak-Latest.apk
+    echo "========================================================"
+    echo "FIRESTORE UNIFIED RELEASE SUCCESSFUL! File: Sahayak-FirestoreUnified-Release.apk"
+    echo "========================================================"
+else
+    echo "=========================================="
+    echo "BUILD FAILED! ERROR DETAILS:"
+    echo "=========================================="
+    grep -i -A 2 -B 1 -E "error:|caused by:|AAPT:|e: " build.log | head -n 25
+fi
+
+# 6. RAM Cleanup
+./gradlew --stop
