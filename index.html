@@ -45,12 +45,20 @@
 
 <div class="container">
     <div class="header">
-        <h1>সহায়ক (Sahayak) - ফায়ারস্টোর এডমিন প্যানেল</h1>
-        <p>লালপুর উপজেলা জরুরি তথ্য, সংবাদ ও রিভিউ ড্যাশবোর্ড</p>
+        <h1>সহায়ক (Sahayak) - ফায়ারস্টোর এডমিন ড্যাশবোর্ড</h1>
+        <p>লালপুর উপজেলা জরুরি তথ্য, সংবাদ, এপিআই ও রিভিউ প্যানেল</p>
     </div>
 
     <!-- Alert Box -->
     <div id="alertBox" class="alert"></div>
+
+    <!-- Section 0: ImgBB API Key Configuration -->
+    <div class="card" style="background: #f0f7f4; border: 1px solid #006A4E;">
+        <h2>🔑 ImgBB ইমেজ আপলোড API Key সেটিং</h2>
+        <label for="imgbbApiKeyInput">ImgBB API Key (*):</label>
+        <input type="text" id="imgbbApiKeyInput" placeholder="আপনার ImgBB API Key পেস্ট করুন (যেমন: 6d7007326130a08e1a026e6d15a95f5e)">
+        <button onclick="saveImgbbApiKey()" style="background: #28a745;">API Key সেভ করুন</button>
+    </div>
 
     <!-- Section 1: Scrolling Notice Bar Update -->
     <div class="card">
@@ -167,6 +175,26 @@
         setTimeout(() => { alertBox.style.display = 'none'; }, 4000);
     }
 
+    // 0. Save ImgBB API Key
+    function saveImgbbApiKey() {
+        const apiKey = document.getElementById('imgbbApiKeyInput').value.trim();
+        if (!apiKey) return showAlert("ImgBB API Key প্রদান করুন!", false);
+
+        db.collection('settings').doc('config').set({
+            imgbbApiKey: apiKey,
+            updatedAt: firebase.firestore.Timestamp.now()
+        }, { merge: true })
+        .then(() => showAlert("ImgBB API Key সফলভাবে ফায়ারস্টোরে সেভ হয়েছে!", true))
+        .catch((err) => showAlert("ত্রুটি: " + err.message, false));
+    }
+
+    // Fetch ImgBB API Key on Load
+    db.collection('settings').doc('config').onSnapshot(doc => {
+        if (doc.exists && doc.data().imgbbApiKey) {
+            document.getElementById('imgbbApiKeyInput').value = doc.data().imgbbApiKey;
+        }
+    });
+
     // 1. Update Notice in Firestore
     function updateNotice() {
         const text = document.getElementById('newsInput').value;
@@ -176,7 +204,7 @@
             text: text,
             updatedAt: firebase.firestore.Timestamp.now()
         })
-        .then(() => showAlert("নোটিশ সফলভাবে ফায়ারস্টোরে সেভ হয়েছে!", true))
+        .then(() => showAlert("নোটিশ সফলভাবে সেভ হয়েছে!", true))
         .catch((err) => showAlert("ত্রুটি: " + err.message, false));
     }
 
