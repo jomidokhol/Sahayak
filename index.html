@@ -46,7 +46,7 @@
 <div class="container">
     <div class="header">
         <h1>সহায়ক (Sahayak) - এডমিন ড্যাশবোর্ড</h1>
-        <p>লালপুর উপজেলা জরুরি তথ্য, সংবাদ ও রিভিউ প্যানেল</p>
+        <p>লালপুর উপজেলা এডমিন অ্যাডভান্সড প্যানেল</p>
     </div>
 
     <!-- Alert Box -->
@@ -54,7 +54,7 @@
 
     <!-- Section 1: Scrolling Notice Bar Update -->
     <div class="card">
-        <h2>১. স্ক্রলিং নোটিশ আপডেট (অ্যাপের ওপরের চিকন বার)</h2>
+        <h2>১. স্ক্রলিং নোটিশ আপডেট (অ্যাপের ওপরের বার)</h2>
         <label for="newsInput">নোটিশ বার্তা:</label>
         <textarea id="newsInput" rows="2" placeholder="যেমন: আগামী কাল লালপুরে বিদ্যুৎ সরবরাহ বন্ধ থাকবে..."></textarea>
         <button onclick="updateNotice()">নোটিশ সেভ করুন</button>
@@ -62,14 +62,14 @@
 
     <!-- Section 2: News Upload with Title, Image & Description -->
     <div class="card">
-        <h2>২. নতুন খবর ও ছবি কভার যোগ করুন (News & Updates Slider)</h2>
+        <h2>২. নতুন খবর ও ছবি কভার যোগ করুন (News Carousel Slider)</h2>
         <label for="newsTitle">সংবাদের শিরোনাম (*):</label>
         <input type="text" id="newsTitle" placeholder="যেমন: লালপুর হাসপাতালে নতুন অ্যাম্বুলেন্স সংযোজন">
 
         <label for="newsImageUrl">কভার ইমেজের লিংক (Image URL):</label>
         <input type="text" id="newsImageUrl" placeholder="যেমন: https://i.ibb.co/example.jpg">
 
-        <label for="newsDetail">সংবাদের বিস্তারিত ವಿವರণে:</label>
+        <label for="newsDetail">সংবাদের বিস্তারিত বিবরণ:</label>
         <textarea id="newsDetail" rows="4" placeholder="সংবাদের বিস্তারিত বিষয়বস্তু এখানে লিখুন..."></textarea>
 
         <button onclick="publishNewsArticle()">খবর পাবলিশ করুন</button>
@@ -77,7 +77,7 @@
 
     <!-- Section 3: Public Box Requests Review Panel -->
     <div class="card">
-        <h2>৩. পাবলিক বক্স পোস্ট রিভিউ প্যানেল (ইউজারদের প্রশ্ন/পোস্ট)</h2>
+        <h2>৩. ইউজারদের পাবলিক বক্স পোস্ট রিভিউ প্যানেল</h2>
         <button onclick="loadPendingPublicPosts()" style="background: #2196F3; margin-bottom: 10px;">রিভিউ তালিকা রিফ্রেশ করুন 🔄</button>
         <div id="pendingPostsContainer">
             <p style="text-align: center; color: #777;">পেন্ডিং পোস্ট লোড হচ্ছে...</p>
@@ -136,11 +136,9 @@
         measurementId: "G-686DJLJYMQ"
     };
 
-    // Firebase Initialize
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
-    // Alert Notification
     function showAlert(msg, isSuccess) {
         const alertBox = document.getElementById('alertBox');
         alertBox.innerText = msg;
@@ -153,21 +151,11 @@
     // 1. Update Scrolling Notice
     function updateNotice() {
         const news = document.getElementById('newsInput').value;
-        if (!news.trim()) {
-            showAlert("মেহেরবানি করে নোটিশ বার্তা লিখুন!", false);
-            return;
-        }
+        if (!news.trim()) return showAlert("নোটিশ বার্তা লিখুন!", false);
         database.ref('news_update').set(news)
             .then(() => showAlert("নোটিশ সফলভাবে আপডেট হয়েছে!", true))
             .catch((err) => showAlert("ত্রুটি: " + err.message, false));
     }
-
-    // Fetch Scrolling Notice on Page Load
-    database.ref('news_update').on('value', (snapshot) => {
-        if (snapshot.exists()) {
-            document.getElementById('newsInput').value = snapshot.val();
-        }
-    });
 
     // 2. Publish Full News Article with Cover Image
     function publishNewsArticle() {
@@ -175,10 +163,7 @@
         const imageUrl = document.getElementById('newsImageUrl').value;
         const desc = document.getElementById('newsDetail').value;
 
-        if (!title.trim()) {
-            showAlert("সংবাদের শিরোনাম দেওয়া আবশ্যক!", false);
-            return;
-        }
+        if (!title.trim()) return showAlert("সংবাদের শিরোনাম দেওয়া আবশ্যক!", false);
 
         const newsRef = database.ref('news_list').push();
         newsRef.set({
@@ -189,7 +174,7 @@
             timestamp: Date.now()
         })
         .then(() => {
-            showAlert("সংবাদটি সফলভাবে নিউজ ফিডে সেভ হয়েছে!", true);
+            showAlert("সংবাদটি সফলভাবে নিউজ কভারে সেভ হয়েছে!", true);
             document.getElementById('newsTitle').value = '';
             document.getElementById('newsImageUrl').value = '';
             document.getElementById('newsDetail').value = '';
@@ -197,12 +182,12 @@
         .catch((err) => showAlert("ত্রুটি: " + err.message, false));
     }
 
-    // 3. Load Pending Public Box Posts for Review
+    // 3. Load Pending Public Box Posts from inside users/{uid}/posts Node
     function loadPendingPublicPosts() {
         const container = document.getElementById('pendingPostsContainer');
         container.innerHTML = '<p style="text-align: center; color: #777;">লোড হচ্ছে...</p>';
 
-        database.ref('public_posts').on('value', (snapshot) => {
+        database.ref('users').on('value', (snapshot) => {
             container.innerHTML = '';
             if (!snapshot.exists()) {
                 container.innerHTML = '<p style="text-align: center; color: #777;">কোনো পেন্ডিং পোস্ট বা প্রশ্ন নেই।</p>';
@@ -210,25 +195,30 @@
             }
 
             let pendingCount = 0;
-            snapshot.forEach((childSnapshot) => {
-                const key = childSnapshot.key;
-                const post = childSnapshot.val();
+            snapshot.forEach((userSnapshot) => {
+                const userUid = userSnapshot.key;
+                const postsSnapshot = userSnapshot.child('posts');
 
-                if (post.isApproved === false) {
-                    pendingCount++;
-                    const card = document.createElement('div');
-                    card.className = 'item-card';
-                    card.innerHTML = `
-                        <h4>লেখক: ${escapeHtml(post.userName || 'অজ্ঞাত ইউজার')}</h4>
-                        <p><strong>বক্তব্য/প্রশ্ন:</strong> ${escapeHtml(post.content)}</p>
-                        <p><small>সময়: ${new Date(post.timestamp || Date.now()).toLocaleString('bn-BD')}</small></p>
-                        <div class="btn-group">
-                            <button class="btn-success" onclick="approvePost('${key}')">অনুমোদন করুন (Accept)</button>
-                            <button class="btn-danger" onclick="declinePost('${key}')">বাতিল করুন (Decline)</button>
-                        </div>
-                    `;
-                    container.appendChild(card);
-                }
+                postsSnapshot.forEach((postSnapshot) => {
+                    const postKey = postSnapshot.key;
+                    const post = postSnapshot.val();
+
+                    if (post && post.isApproved === false) {
+                        pendingCount++;
+                        const card = document.createElement('div');
+                        card.className = 'item-card';
+                        card.innerHTML = `
+                            <h4>লেখক: ${escapeHtml(post.userName || 'ইউজার')} (UID: ${userUid.substring(0,6)}...)</h4>
+                            <p><strong>বক্তব্য/প্রশ্ন:</strong> ${escapeHtml(post.content)}</p>
+                            <p><small>সময়: ${new Date(post.timestamp || Date.now()).toLocaleString('bn-BD')}</small></p>
+                            <div class="btn-group">
+                                <button class="btn-success" onclick="approvePost('${userUid}', '${postKey}')">অনুমোদন করুন (Accept)</button>
+                                <button class="btn-danger" onclick="declinePost('${userUid}', '${postKey}')">বাতিল করুন (Decline)</button>
+                            </div>
+                        `;
+                        container.appendChild(card);
+                    }
+                });
             });
 
             if (pendingCount === 0) {
@@ -237,17 +227,17 @@
         });
     }
 
-    // Accept Public Post
-    function approvePost(key) {
-        database.ref('public_posts/' + key).update({ isApproved: true })
+    // Accept User Post inside users/{uid}/posts/{postKey}
+    function approvePost(userUid, postKey) {
+        database.ref(`users/${userUid}/posts/${postKey}`).update({ isApproved: true })
             .then(() => showAlert("পোস্টটি সফলভাবে অনুমোদন (Approved) করা হয়েছে!", true))
             .catch((err) => showAlert("ত্রুটি: " + err.message, false));
     }
 
-    // Decline/Delete Public Post
-    function declinePost(key) {
+    // Decline User Post
+    function declinePost(userUid, postKey) {
         if (confirm("আপনি কি নিশ্চিত যে পোস্টটি বাতিল ও মুছে ফেলতে চান?")) {
-            database.ref('public_posts/' + key).remove()
+            database.ref(`users/${userUid}/posts/${postKey}`).remove()
                 .then(() => showAlert("পোস্টটি মুছে ফেলা হয়েছে!", true))
                 .catch((err) => showAlert("ত্রুটি: " + err.message, false));
         }
@@ -262,39 +252,29 @@
         const phone = document.getElementById('phone').value;
         const location = document.getElementById('location').value;
 
-        if (!name.trim() || !phone.trim()) {
-            showAlert("নাম এবং নম্বর অবশ্যই দিতে হবে!", false);
-            return;
-        }
+        if (!name.trim() || !phone.trim()) return showAlert("নাম এবং নম্বর অবশ্যই দিতে হবে!", false);
 
         const data = { category, name, title, phone, location };
 
         if (editKey) {
             database.ref('contacts/' + editKey).update(data)
-                .then(() => {
-                    showAlert("কন্টাক্ট সফলভাবে আপডেট হয়েছে!", true);
-                    resetForm();
-                })
+                .then(() => { showAlert("কন্টাক্ট সফলভাবে আপডেট হয়েছে!", true); resetForm(); })
                 .catch((err) => showAlert("ত্রুটি: " + err.message, false));
         } else {
             const newRef = database.ref('contacts').push();
             data.id = newRef.key;
             newRef.set(data)
-                .then(() => {
-                    showAlert("নতুন কন্টাক্ট সফলভাবে সেভ হয়েছে!", true);
-                    resetForm();
-                })
+                .then(() => { showAlert("নতুন কন্টাক্ট সফলভাবে সেভ হয়েছে!", true); resetForm(); })
                 .catch((err) => showAlert("ত্রুটি: " + err.message, false));
         }
     }
 
-    // 5. Listen and Render Contacts List
+    // 5. Render Contacts
     database.ref('contacts').on('value', (snapshot) => {
         const container = document.getElementById('contactsContainer');
         container.innerHTML = '';
-
         if (!snapshot.exists()) {
-            container.innerHTML = '<p style="text-align: center; color: #777;">এখনো কোনো কন্টাক্ট ডাটাবেজে যোগ করা হয়নি।</p>';
+            container.innerHTML = '<p style="text-align: center; color: #777;">এখনো কোনো কন্টাক্ট যোগ করা হয়নি।</p>';
             return;
         }
 
@@ -347,7 +327,7 @@
     }
 
     function deleteContact(key) {
-        if (confirm("আপনি কি নিশ্চিত যে এই কন্টাক্টটি মুছে ফেলতে চান?")) {
+        if (confirm("আপনি কি নিশ্চিত যে এটি মুছে ফেলতে চান?")) {
             database.ref('contacts/' + key).remove()
                 .then(() => showAlert("কন্টাক্ট সফলভাবে মুছে ফেলা হয়েছে!", true))
                 .catch((err) => showAlert("ত্রুটি: " + err.message, false));
@@ -355,27 +335,14 @@
     }
 
     function getCategoryName(cat) {
-        const categories = {
-            'doctor': 'ডাক্তার ও হাসপাতাল',
-            'mechanic': 'মেকানিক ও গ্যারেজ',
-            'fuel': 'তেল পাম্প ও পেট্রোল',
-            'emergency': 'জরুরি সেবা',
-            'other': 'অন্যান্য'
-        };
+        const categories = { 'doctor': 'ডাক্তার ও হাসপাতাল', 'mechanic': 'মেকানিক ও গ্যারেজ', 'fuel': 'তেল পাম্প ও পেট্রোল', 'emergency': 'জরুরি সেবা', 'other': 'অন্যান্য' };
         return categories[cat] || cat;
     }
 
-    function escapeHtml(str) {
-        return (str || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-    }
-    function escapeJs(str) {
-        return (str || '').replace(/'/g, "\\'").replace(/"/g, '\\"');
-    }
+    function escapeHtml(str) { return (str || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+    function escapeJs(str) { return (str || '').replace(/'/g, "\\'").replace(/"/g, '\\"'); }
 
-    // Page Load Setup
-    window.onload = function() {
-        loadPendingPublicPosts();
-    };
+    window.onload = function() { loadPendingPublicPosts(); };
 </script>
 
 </body>
