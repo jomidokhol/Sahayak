@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>সহায়ক - লালপুর এডমিন প্যানেল (Cloud Firestore)</title>
+    <title>সহায়ক - লালপুর এডমিন প্যানেল (HTML Rich Text Tool)</title>
     <style>
         * { box-sizing: border-box; }
         body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f0f2f5; margin: 0; padding: 12px; color: #333; }
@@ -18,6 +18,15 @@
         label { display: block; font-weight: bold; margin-top: 10px; font-size: 13px; }
         input, select, textarea { width: 100%; padding: 10px; margin-top: 4px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; }
         
+        /* HTML Toolbar Styling */
+        .toolbar { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; margin-bottom: 6px; background: #eef2f5; padding: 8px; border-radius: 6px; border: 1px solid #d0d7de; }
+        .tool-btn { background: #006A4E; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; margin-top: 0; width: auto; }
+        .tool-btn:hover { background-color: #00523d; }
+        .tool-btn-accent { background: #1877F2; }
+        
+        .preview-box { border: 1px dashed #006A4E; background: #ffffff; padding: 12px; border-radius: 6px; margin-top: 8px; min-height: 80px; max-height: 250px; overflow-y: auto; font-size: 14px; line-height: 1.5; }
+        .preview-box img { max-width: 100%; height: auto; border-radius: 6px; }
+
         button { background: #006A4E; color: white; border: none; padding: 12px; border-radius: 6px; font-size: 15px; font-weight: bold; width: 100%; cursor: pointer; margin-top: 12px; }
         button:hover { background-color: #00523d; }
         button.btn-danger { background: #dc3545; }
@@ -45,8 +54,8 @@
 
 <div class="container">
     <div class="header">
-        <h1>সহায়ক (Sahayak) - ফায়ারস্টোর এডমিন ড্যাশবোর্ড</h1>
-        <p>লালপুর উপজেলা জরুরি তথ্য, সংবাদ, এপিআই ও রিভিউ প্যানেল</p>
+        <h1>সহায়ক (Sahayak) - ফায়ারস্টোর এডমিন প্যানেল</h1>
+        <p>লালপুর উপজেলা জরুরি তথ্য, সংবাদ, এপিআই ও রিভিউ ড্যাশবোর্ড</p>
     </div>
 
     <!-- Alert Box -->
@@ -68,17 +77,33 @@
         <button onclick="updateNotice()">নোটিশ সেভ করুন</button>
     </div>
 
-    <!-- Section 2: News Upload -->
+    <!-- Section 2: News Upload with HTML Rich Text Tool -->
     <div class="card">
-        <h2>২. নতুন খবর ও ছবি কভার যোগ করুন (News Carousel Slider)</h2>
+        <h2>২. নতুন খবর ও কভার যোগ করুন (HTML রিচ টেক্সট টুলসহ)</h2>
         <label for="newsTitle">সংবাদের শিরোনাম (*):</label>
         <input type="text" id="newsTitle" placeholder="যেমন: লালপুর হাসপাতালে নতুন অ্যাম্বুলেন্স সংযোজন">
 
         <label for="newsImageUrl">কভার ইমেজের লিংক (Image URL):</label>
         <input type="text" id="newsImageUrl" placeholder="যেমন: https://i.ibb.co/example.jpg">
 
-        <label for="newsDetail">সংবাদের বিস্তারিত বিবরণ:</label>
-        <textarea id="newsDetail" rows="4" placeholder="সংবাদের বিস্তারিত বিষয়বস্তু এখানে লিখুন..."></textarea>
+        <label for="newsDetail">সংবাদের বিস্তারিত বিবরণ (HTML টুলবার ব্যবহার করুন):</label>
+
+        <!-- HTML Formatting Toolbar -->
+        <div class="toolbar">
+            <button type="button" class="tool-btn" onclick="insertTag('<b>', '</b>')"><b>B</b> গাঢ়</button>
+            <button type="button" class="tool-btn" onclick="insertTag('<i>', '</i>')"><i>I</i> বাঁকা</button>
+            <button type="button" class="tool-btn" onclick="insertTag('<u>', '</u>')"><u>U</u> আন্ডারলাইন</button>
+            <button type="button" class="tool-btn" onclick="insertTag('<h1>', '</h1>')">H1 হেডিং</button>
+            <button type="button" class="tool-btn" onclick="insertTag('<br>\n', '')">↵ লাইন ব্রেক</button>
+            <button type="button" class="tool-btn tool-btn-accent" onclick="insertLink()">🔗 লিংক</button>
+            <button type="button" class="tool-btn tool-btn-accent" onclick="insertInlineImage()">🖼️ ছবি</button>
+            <button type="button" class="tool-btn" onclick="insertTag('<li>', '</li>')">• বুলেট লিস্ট</button>
+        </div>
+
+        <textarea id="newsDetail" rows="6" oninput="updateNewsPreview()" placeholder="সংবাদের বিস্তারিত বিষয়বস্তু এখানে লিখুন..."></textarea>
+
+        <label>লাইভ এইচটিএমএল প্রিভিউ (Live Output Preview):</label>
+        <div id="newsPreviewBox" class="preview-box"><i>এখানে খবরের লাইভ প্রিভিউ দেখা যাবে...</i></div>
 
         <button onclick="publishNewsArticle()">খবর পাবলিশ করুন</button>
     </div>
@@ -175,6 +200,45 @@
         setTimeout(() => { alertBox.style.display = 'none'; }, 4000);
     }
 
+    // HTML Formatting Toolbar Helpers
+    function insertTag(startTag, endTag) {
+        const textarea = document.getElementById('newsDetail');
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const selectedText = textarea.value.substring(start, end);
+
+        let replacement = startTag + selectedText + (endTag || '');
+        if (!selectedText && endTag) {
+            replacement = startTag + "লেখা রাখুন" + endTag;
+        }
+
+        textarea.value = textarea.value.substring(0, start) + replacement + textarea.value.substring(end);
+        textarea.focus();
+        textarea.setSelectionRange(start + startTag.length, start + replacement.length - (endTag ? endTag.length : 0));
+        updateNewsPreview();
+    }
+
+    function insertLink() {
+        const url = prompt("লিংক (URL) প্রদান করুন:", "https://");
+        if (url) {
+            const linkText = prompt("লিংকের টেক্সট প্রদান করুন:", "এখানে ক্লিক করুন");
+            insertTag(`<a href="${url}" target="_blank">${linkText || 'লিংক'}</a>`, '');
+        }
+    }
+
+    function insertInlineImage() {
+        const imgUrl = prompt("ইমেজ ইউআরএল (Image URL) প্রদান করুন:", "https://i.ibb.co/");
+        if (imgUrl) {
+            insertTag(`<img src="${imgUrl}" alt="ছবি" />`, '');
+        }
+    }
+
+    function updateNewsPreview() {
+        const html = document.getElementById('newsDetail').value;
+        const previewBox = document.getElementById('newsPreviewBox');
+        previewBox.innerHTML = html || '<i>এখানে খবরের লাইভ প্রিভিউ দেখা যাবে...</i>';
+    }
+
     // 0. Save ImgBB API Key
     function saveImgbbApiKey() {
         const apiKey = document.getElementById('imgbbApiKeyInput').value.trim();
@@ -233,6 +297,7 @@
             document.getElementById('newsTitle').value = '';
             document.getElementById('newsImageUrl').value = '';
             document.getElementById('newsDetail').value = '';
+            updateNewsPreview();
         })
         .catch((err) => showAlert("ত্রুটি: " + err.message, false));
     }
