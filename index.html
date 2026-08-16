@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>সহায়ক - লালপুর এডমিন প্যানেল (Cloud Firestore)</title>
+    <title>সহায়ক - লালপুর এডমিন প্যানেল (Open Chat Sync)</title>
     <style>
         * { box-sizing: border-box; }
         body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f0f2f5; margin: 0; padding: 12px; color: #333; }
@@ -18,7 +18,6 @@
         label { display: block; font-weight: bold; margin-top: 10px; font-size: 13px; }
         input, select, textarea { width: 100%; padding: 10px; margin-top: 4px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; }
         
-        /* HTML Toolbar Styling */
         .toolbar { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; margin-bottom: 6px; background: #eef2f5; padding: 8px; border-radius: 6px; border: 1px solid #d0d7de; }
         .tool-btn { background: #006A4E; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; margin-top: 0; width: auto; }
         .tool-btn:hover { background-color: #00523d; }
@@ -46,7 +45,6 @@
         .badge { display: inline-block; background: #e8f5e9; color: #2e7d32; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; margin-bottom: 4px; }
     </style>
 
-    <!-- Firebase SDK Compat for Cloud Firestore -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 </head>
@@ -54,8 +52,8 @@
 
 <div class="container">
     <div class="header">
-        <h1>সহায়ক (Sahayak) - ফায়ারস্টোর এডমিন প্যানেল</h1>
-        <p>লালপুর উপজেলা জরুরি তথ্য, সংবাদ, এপিআই ও রিভিউ ড্যাশবোর্ড</p>
+        <h1>সহায়ক (Sahayak) - ওপেন চ্যাট এডমিন প্যানেল</h1>
+        <p>লালপুর উপজেলা জরুরি তথ্য, ওপেন চ্যাট ও রিভিউ ড্যাশবোর্ড</p>
     </div>
 
     <!-- Alert Box -->
@@ -77,7 +75,7 @@
         <button onclick="updateNotice()">নোটিশ সেভ করুন</button>
     </div>
 
-    <!-- Section 2: News Upload with HTML Rich Text Tool -->
+    <!-- Section 2: News Upload -->
     <div class="card">
         <h2>২. নতুন খবর ও কভার যোগ করুন (HTML রিচ টেক্সট টুলসহ)</h2>
         <label for="newsTitle">সংবাদের শিরোনাম (*):</label>
@@ -86,9 +84,8 @@
         <label for="newsImageUrl">কভার ইমেজের লিংক (Image URL):</label>
         <input type="text" id="newsImageUrl" placeholder="যেমন: https://i.ibb.co/example.jpg">
 
-        <label for="newsDetail">সংবাদের বিস্তারিত বিবরণ (HTML টুলবার ব্যবহার করুন):</label>
+        <label for="newsDetail">সংবাদের বিস্তারিত বিবরণ:</label>
 
-        <!-- HTML Formatting Toolbar -->
         <div class="toolbar">
             <button type="button" class="tool-btn" onclick="insertTag('<b>', '</b>')"><b>B</b> গাঢ়</button>
             <button type="button" class="tool-btn" onclick="insertTag('<i>', '</i>')"><i>I</i> বাঁকা</button>
@@ -102,16 +99,33 @@
 
         <textarea id="newsDetail" rows="6" oninput="updateNewsPreview()" placeholder="সংবাদের বিস্তারিত বিষয়বস্তু এখানে লিখুন..."></textarea>
 
-        <label>লাইভ এইচটিএমএল প্রিভিউ (Live Output Preview):</label>
+        <label>লাইভ এইচটিএমএল প্রিভিউ:</label>
         <div id="newsPreviewBox" class="preview-box"><i>এখানে খবরের লাইভ প্রিভিউ দেখা যাবে...</i></div>
 
         <button onclick="publishNewsArticle()">খবর পাবলিশ করুন</button>
     </div>
 
-    <!-- Section 3: Public Box Requests Review -->
+    <!-- Section 3: Open Chat Admin Post Entry & Review Panel -->
     <div class="card">
-        <h2>৩. পাবলিক বক্স পোস্ট প্যানেল</h2>
-        <button onclick="loadPublicPosts()" style="background: #2196F3; margin-bottom: 10px;">পোস্ট তালিকা রিফ্রেশ করুন 🔄</button>
+        <h2>৩. ওপেন চ্যাট পোস্ট প্যানেল ও কাস্টম পোস্ট এন্ট্রি</h2>
+        
+        <!-- Custom UID Admin Post Form -->
+        <div style="background: #eef9f5; border: 1px solid #28a745; padding: 12px; border-radius: 8px; margin-bottom: 15px;">
+            <h4 style="margin:0 0 10px 0; color:#006A4E;">✍️ কাস্টম UID ব্যবহার করে ওপেন চ্যাটে পোস্ট করুন</h4>
+            
+            <label for="adminChatUid">ইউজারের UID (অপশনাল - ফাঁকা রাখলে 'admin' হবে):</label>
+            <input type="text" id="adminChatUid" placeholder="যেমন: UID_123456789">
+
+            <label for="adminChatName">ইউজারের নাম (অপশনাল):</label>
+            <input type="text" id="adminChatName" placeholder="যেমন: এডমিন / লালপুরবাসী">
+
+            <label for="adminChatContent">পোস্টের বক্তব্য (*):</label>
+            <textarea id="adminChatContent" rows="3" placeholder="ওপেন চ্যাটে প্রদর্শনের জন্য পোস্টের বার্তা টাইপ করুন..."></textarea>
+
+            <button onclick="postToOpenChat()" style="background: #28a745; margin-top: 10px;">ওপেন চ্যাটে পোস্ট প্রকাশ করুন</button>
+        </div>
+
+        <button onclick="loadOpenChatPosts()" style="background: #2196F3; margin-bottom: 10px;">ওপেন চ্যাট পোস্ট তালিকা রিফ্রেশ করুন 🔄</button>
         <div id="pendingPostsContainer">
             <p style="text-align: center; color: #777;">পোস্ট লোড হচ্ছে...</p>
         </div>
@@ -141,6 +155,7 @@
             <option value="gas">গ্যাস সেবা</option>
             <option value="ambulance">অ্যাম্বুলেন্স</option>
             <option value="courier">কুরিয়ার</option>
+            <option value="fuel">তেল পাম্প ও পেট্রোল</option>
             <option value="other">অন্যান্য সেবা</option>
         </select>
 
@@ -199,7 +214,6 @@
         setTimeout(() => { alertBox.style.display = 'none'; }, 4000);
     }
 
-    // HTML Formatting Toolbar Helpers
     function insertTag(startTag, endTag) {
         const textarea = document.getElementById('newsDetail');
         const start = textarea.selectionStart;
@@ -247,11 +261,10 @@
             imgbbApiKey: apiKey,
             updatedAt: firebase.firestore.Timestamp.now()
         }, { merge: true })
-        .then(() => showAlert("ImgBB API Key সফলভাবে ফায়ারস্টোরে সেভ হয়েছে!", true))
+        .then(() => showAlert("ImgBB API Key সফলভাবে সেভ হয়েছে!", true))
         .catch((err) => showAlert("ত্রুটি: " + err.message, false));
     }
 
-    // Fetch ImgBB API Key on Load
     db.collection('settings').doc('config').onSnapshot(doc => {
         if (doc.exists && doc.data().imgbbApiKey) {
             document.getElementById('imgbbApiKeyInput').value = doc.data().imgbbApiKey;
@@ -277,7 +290,7 @@
         }
     });
 
-    // 2. Publish News Article in Firestore
+    // 2. Publish News Article
     function publishNewsArticle() {
         const title = document.getElementById('newsTitle').value;
         const imageUrl = document.getElementById('newsImageUrl').value;
@@ -292,7 +305,7 @@
             timestamp: firebase.firestore.Timestamp.now()
         })
         .then(() => {
-            showAlert("সংবাদটি সফলভাবে ফায়ারস্টোরে সেভ হয়েছে!", true);
+            showAlert("সংবাদটি সফলভাবে সেভ হয়েছে!", true);
             document.getElementById('newsTitle').value = '';
             document.getElementById('newsImageUrl').value = '';
             document.getElementById('newsDetail').value = '';
@@ -301,31 +314,51 @@
         .catch((err) => showAlert("ত্রুটি: " + err.message, false));
     }
 
-    // 3. Load Public Box Posts from Firestore
-    function loadPublicPosts() {
-        const container = document.getElementById('pendingPostsContainer');
-        container.innerHTML = '<p style="text-align: center; color: #777;">লোড হচ্ছে...</p>';
+    // 3. Open Chat Admin Post Entry & Review Management
+    function postToOpenChat() {
+        const uid = document.getElementById('adminChatUid').value.trim() || 'admin_user';
+        const name = document.getElementById('adminChatName').value.trim() || 'লালপুরবাসী';
+        const content = document.getElementById('adminChatContent').value.trim();
 
-        db.collection('public_box').onSnapshot(snapshot => {
+        if (!content) return showAlert("পোস্টের বক্তব্য প্রদান করুন!", false);
+
+        db.collection('openchat').add({
+            userid: uid,
+            userName: name,
+            content: content,
+            uploadtime: firebase.firestore.Timestamp.now()
+        })
+        .then(() => {
+            showAlert("ওপেন চ্যাটে পোস্টটি সফলভাবে প্রকাশিত হয়েছে!", true);
+            document.getElementById('adminChatContent').value = '';
+        })
+        .catch((err) => showAlert("ত্রুটি: " + err.message, false));
+    }
+
+    function loadOpenChatPosts() {
+        const container = document.getElementById('pendingPostsContainer');
+        container.innerHTML = '<p style="text-align: center; color: #777;">ওপেন চ্যাট পোস্ট লোড হচ্ছে...</p>';
+
+        db.collection('openchat').onSnapshot(snapshot => {
             container.innerHTML = '';
             if (snapshot.empty) {
-                container.innerHTML = '<p style="text-align: center; color: #777;">কোনো পোস্ট নেই।</p>';
+                container.innerHTML = '<p style="text-align: center; color: #777;">ওপেন চ্যাটে কোনো পোস্ট নেই।</p>';
                 return;
             }
 
             snapshot.forEach(doc => {
                 const post = doc.data();
                 const key = doc.id;
-                const timeStr = post.timestamp ? new Date(post.timestamp.toDate()).toLocaleString('bn-BD') : 'এখন';
+                const timeStr = post.uploadtime ? new Date(post.uploadtime.toDate()).toLocaleString('bn-BD') : 'এখন';
 
                 const card = document.createElement('div');
                 card.className = 'item-card';
                 card.innerHTML = `
-                    <h4>লেখক: ${escapeHtml(post.userName || 'ইউজার')}</h4>
-                    <p><strong>বক্তব্য/প্রশ্ন:</strong> ${escapeHtml(post.content)}</p>
+                    <h4>লেখক: ${escapeHtml(post.userName || 'ইউজার')} (UID: ${escapeHtml(post.userid || 'N/A')})</h4>
+                    <p><strong>বক্তব্য:</strong> ${escapeHtml(post.content)}</p>
                     <p><small>সময়: ${timeStr}</small></p>
                     <div class="btn-group">
-                        <button class="btn-danger" style="width:100%;" onclick="deletePost('${key}')">পোস্ট মুছে ফেলুন (Delete)</button>
+                        <button class="btn-danger" style="width:100%;" onclick="deleteOpenChatPost('${key}')">পোস্ট মুছে ফেলুন (Delete)</button>
                     </div>
                 `;
                 container.appendChild(card);
@@ -333,15 +366,15 @@
         });
     }
 
-    function deletePost(key) {
-        if (confirm("আপনি কি নিশ্চিত যে পোস্টটি মুছে ফেলতে চান?")) {
-            db.collection('public_box').doc(key).delete()
+    function deleteOpenChatPost(key) {
+        if (confirm("আপনি কি নিশ্চিত যে এই ওপেন চ্যাট পোস্টটি মুছে ফেলতে চান?")) {
+            db.collection('openchat').doc(key).delete()
                 .then(() => showAlert("পোস্টটি মুছে ফেলা হয়েছে!", true))
                 .catch((err) => showAlert("ত্রুটি: " + err.message, false));
         }
     }
 
-    // 4. Save Contacts in Firestore
+    // 4. Save Contacts
     function saveContact() {
         const editKey = document.getElementById('editKey').value;
         const category = document.getElementById('category').value;
@@ -362,12 +395,11 @@
                 .catch((err) => showAlert("ত্রুটি: " + err.message, false));
         } else {
             db.collection('contacts').add(data)
-                .then(() => { showAlert("নতুন কন্টাক্ট ফায়ারস্টোরে সেভ হয়েছে!", true); resetForm(); })
+                .then(() => { showAlert("নতুন কন্টাক্ট সেভ হয়েছে!", true); resetForm(); })
                 .catch((err) => showAlert("ত্রুটি: " + err.message, false));
         }
     }
 
-    // Render Contacts
     db.collection('contacts').onSnapshot(snapshot => {
         const container = document.getElementById('contactsContainer');
         container.innerHTML = '';
@@ -452,9 +484,9 @@
             'diagnostic': 'ডায়াগনস্টিক', 
             'computer': 'কম্পিউটার', 
             'hotel': 'হোটেল', 
-            'restaurant': 'রেস্টুরেন্ট',
-            'petrol': 'পেট্রোল পাম্প',
-            'gas': 'গ্যাস সেবা',
+            'restaurant': 'রেস্টুরেন্ট', 
+            'petrol': 'পেট্রোল পাম্প', 
+            'gas': 'গ্যাস সেবা', 
             'ambulance': 'অ্যাম্বুলেন্স', 
             'courier': 'কুরিয়ার', 
             'fuel': 'পেট্রোল পাম্প', 
@@ -466,8 +498,8 @@
     function escapeHtml(str) { return (str || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
     function escapeJs(str) { return (str || '').replace(/'/g, "\\'").replace(/"/g, '\\"'); }
 
-    window.onload = function() { loadPublicPosts(); };
+    window.onload = function() { loadOpenChatPosts(); };
 </script>
 
 </body>
-</html>
+</html>l
