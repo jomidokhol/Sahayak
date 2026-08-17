@@ -18,9 +18,9 @@
         .message { font-size: 15px; color: #444; line-height: 1.6; margin-bottom: 24px; }
         .btn { display: flex; align-items: center; justify-content: center; width: 100%; padding: 14px; border-radius: 12px; font-size: 16px; font-weight: bold; text-decoration: none; cursor: pointer; transition: all 0.2s ease; margin-bottom: 12px; }
         .btn-app { background: #006A4E; color: white; border: none; box-shadow: 0 4px 12px rgba(0, 106, 78, 0.25); }
-        .btn-app:hover { background: #00523d; }
+        .btn-app:hover { background-color: #00523d; }
         .btn-download { background: #ffffff; color: #006A4E; border: 2px solid #006A4E; }
-        .btn-download:hover { background: #f0fdf4; }
+        .btn-download:hover { background-color: #f0fdf4; }
         .footer-note { font-size: 12px; color: #888; margin-top: 16px; }
     </style>
 </head>
@@ -54,32 +54,41 @@
 </div>
 
 <script>
-    // Detect Current Deep Link Path
     const currentPath = window.location.pathname;
-    const fullUrl = window.location.href;
     const btnOpenApp = document.getElementById('btnOpenApp');
     const typeBadge = document.getElementById('typeBadge');
     const shareMsg = document.getElementById('shareMsg');
 
-    // Intent scheme for Android Deep Linking
-    const intentUrl = "intent://" + window.location.host + currentPath + "#Intent;scheme=https;package=com.nur.sahayak;end";
+    let cleanPath = currentPath;
+    if (cleanPath.startsWith('/')) cleanPath = cleanPath.substring(1);
+
+    // Dual Scheme URLs
+    const customSchemeUrl = "sahayak://" + cleanPath;
+    const androidIntentUrl = "intent://" + cleanPath + "#Intent;scheme=sahayak;package=com.nur.sahayak;end";
 
     if (currentPath.includes('/contact/')) {
         typeBadge.innerText = "📞 জরুরি কন্টাক্ট সেবা";
-        shareMsg.innerHTML = "শেয়ার করা কন্টাক্ট নম্বর ও বিস্তারিত তথ্য দেখতে সহায়ক অ্যাপে প্রবেশ করুন।";
+        shareMsg.innerHTML = "শেয়ার করা কন্টাক্ট নম্বর ও বিস্তারিত তথ্য সরাসরি অ্যাপে দেখতে নিচের বাটনে চাপ দিন।";
     } else if (currentPath.includes('/news/')) {
         typeBadge.innerText = "📰 লালপুর সংবাদ";
-        shareMsg.innerHTML = "সম্পূর্ণ সংবাদটি বিস্তারিত পড়তে সহায়ক অ্যাপে প্রবেশ করুন।";
+        shareMsg.innerHTML = "সম্পূর্ণ সংবাদটি বিস্তারিত পড়তে সরাসরি অ্যাপে প্রবেশ করুন।";
     }
 
-    btnOpenApp.href = intentUrl;
+    btnOpenApp.href = customSchemeUrl;
 
-    // Auto-attempt to open the App if on mobile
+    btnOpenApp.onclick = function(e) {
+        window.location.href = customSchemeUrl;
+        setTimeout(function() {
+            window.location.href = androidIntentUrl;
+        }, 500);
+    };
+
+    // Auto-launch on mobile entry
     window.onload = function() {
         if (/Android/i.test(navigator.userAgent)) {
             setTimeout(function() {
-                window.location.href = intentUrl;
-            }, 600);
+                window.location.href = customSchemeUrl;
+            }, 500);
         }
     };
 </script>
