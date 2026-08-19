@@ -12,7 +12,7 @@
         /* Top App Header */
         .top-header { background: linear-gradient(135deg, #F42A41 0%, #006A4E 100%); color: white; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 12px rgba(0, 106, 78, 0.2); position: sticky; top: 0; z-index: 100; }
         .header-title-box { display: flex; align-items: center; gap: 10px; }
-        .header-title-box img { width: 34dp; height: 34px; border-radius: 50%; background: white; padding: 2px; }
+        .header-title-box img { width: 34px; height: 34px; border-radius: 50%; background: white; padding: 2px; }
         .header-title-box h1 { font-size: 18px; font-weight: bold; }
         
         /* 3-Dot Menu Button */
@@ -116,6 +116,7 @@
         <li><a href="#openchat" onclick="switchPage('pageOpenChat', 'ওপেন চ্যাট মডারেশন', this)">💬 ওপেন চ্যাট মডারেশন</a></li>
         <li><a href="#contacts" onclick="switchPage('pageContacts', 'কন্টাক্ট ও এপ্রুভাল', this)">📞 কন্টাক্ট ও এপ্রুভাল</a></li>
         <li><a href="#terms" onclick="switchPage('pageTerms', 'ব্যবহার নির্দেশিকা ও শর্তাবলী', this)">📜 নিয়মাবলি ও শর্তাবলী</a></li>
+        <li><a href="#paymentplan" onclick="switchPage('pagePaymentPlan', 'পেমেন্ট ও প্ল্যান সেটিংস', this)">💳 পেমেন্ট ও প্ল্যান সেটিংস</a></li>
     </ul>
 </div>
 
@@ -289,6 +290,54 @@
             <div id="termsPreviewBox" class="preview-box"><i>এখানে শর্তাবলীর লাইভ প্রিভিউ দেখা যাবে...</i></div>
 
             <button class="btn-primary" onclick="saveTermsSettings()">শর্তাবলী সেভ করুন</button>
+        </div>
+    </div>
+
+    <!-- ================= PAGE 6: PAYMENT & PLAN SETTINGS ================= -->
+    <div id="pagePaymentPlan" class="page-section">
+        <!-- Payment Gateway Credentials Card -->
+        <div class="card" style="border: 1px solid #006A4E;">
+            <h2>💳 বিকাশ ও নগদ পেমেন্ট গেটওয়ে কনফিগারেশন</h2>
+            <p style="font-size: 13px; color: #555; margin-bottom: 6px;">অ্যাপে চেকআউট পেজের রিয়েলটাইম পেমেন্ট রিকোয়েস্ট চালানোর জন্য গেটওয়ে ক্রেডেনশিয়াল সেভ করুন।</p>
+
+            <label for="gatewayUrlInput">পেমেন্ট গেটওয়ে বেস ইউআরএল (Domain URL):</label>
+            <input type="text" id="gatewayUrlInput" placeholder="যেমন: https://app-sahayak.vercel.app">
+
+            <label for="merchantIdInput">মার্চেন্ট আইডি (Merchant ID *):</label>
+            <input type="text" id="merchantIdInput" placeholder="যেমন: MER-123456">
+
+            <label for="bkashApiKeyInput">বিকাশ এপিআই কী (bKash API Key):</label>
+            <input type="text" id="bkashApiKeyInput" placeholder="যেমন: BK-XXXXXXX">
+
+            <label for="nagadApiKeyInput">নগদ এপিআই কী (Nagad API Key):</label>
+            <input type="text" id="nagadApiKeyInput" placeholder="যেমন: NG-XXXXXXX">
+
+            <button class="btn-primary" onclick="savePaymentConfig()">পেমেন্ট গেটওয়ে সেটিংস সেভ করুন</button>
+        </div>
+
+        <!-- Verification Plans & Pricing Card -->
+        <div class="card">
+            <h2>🛡️ ভেরিফিকেশন সাবস্ক্রিপশন প্ল্যান ও ডিসকাউন্ট রেট</h2>
+            <p style="font-size: 13px; color: #555; margin-bottom: 8px;">১ মাস, ৬ মাস ও ১ বছরের প্ল্যানের দাম এবং ডিসকাউন্ট পার্সেন্টেজ নির্ধারণ করুন।</p>
+
+            <label for="monthlyPriceInput">১ মাসের মূল দাম (টাকা *):</label>
+            <input type="number" id="monthlyPriceInput" oninput="updatePlanCalculationPreview()" placeholder="যেমন: 50">
+
+            <label for="discount6mInput">৬ মাসের ডিসকাউন্ট পার্সেন্ট (%):</label>
+            <input type="number" id="discount6mInput" oninput="updatePlanCalculationPreview()" placeholder="যেমন: 15">
+
+            <label for="discount12mInput">১ বছরের ডিসকাউন্ট পার্সেন্ট (%):</label>
+            <input type="number" id="discount12mInput" oninput="updatePlanCalculationPreview()" placeholder="যেমন: 30">
+
+            <!-- Live Calculation Preview Box -->
+            <label style="margin-top: 16px;">📊 লাইভ প্রাইস ক্যালকুলেশন প্রিভিউ (অ্যাপে যেমন দেখাবে):</label>
+            <div class="preview-box" style="background: #fdfdfd; min-height: auto;">
+                <p id="preview1M" style="color: #006A4E; font-size: 15px; margin-bottom: 6px; font-weight: bold;">১ মাস: ৳৫০</p>
+                <p id="preview6M" style="color: #212121; font-size: 14px; margin-bottom: 6px;">৬ মাস: <del>৳৩০০</del> <strong>৳২৫৫</strong> (১৫% ছাড়)</p>
+                <p id="preview12M" style="color: #212121; font-size: 14px;">১ বছর: <del>৳৬০০</del> <strong>৳৪২০</strong> (৩০% ছাড়)</p>
+            </div>
+
+            <button class="btn-primary" onclick="saveVerificationPlans()">প্ল্যান ও ডিসকাউন্ট সেভ করুন</button>
         </div>
     </div>
 
@@ -624,6 +673,78 @@
             const data = doc.data();
             document.getElementById('termsContentInput').value = data.content || data.desc || '';
             updateTermsPreview();
+        }
+    });
+
+    // 7. Payment Gateway Configuration (settings/payment_config)
+    function savePaymentConfig() {
+        const gatewayUrl = document.getElementById('gatewayUrlInput').value.trim();
+        const merchantId = document.getElementById('merchantIdInput').value.trim();
+        const bkashApiKey = document.getElementById('bkashApiKeyInput').value.trim();
+        const nagadApiKey = document.getElementById('nagadApiKeyInput').value.trim();
+
+        if (!merchantId) return showAlert("মার্চেন্ট আইডি প্রদান করুন!", false);
+
+        db.collection('settings').doc('payment_config').set({
+            gatewayUrl: gatewayUrl || 'https://app-sahayak.vercel.app',
+            merchantId: merchantId,
+            bkashApiKey: bkashApiKey,
+            nagadApiKey: nagadApiKey,
+            updatedAt: firebase.firestore.Timestamp.now()
+        }, { merge: true })
+        .then(() => showAlert("পেমেন্ট গেটওয়ে সেটিংস সফলভাবে সেভ হয়েছে!", true))
+        .catch((err) => showAlert("ত্রুটি: " + err.message, false));
+    }
+
+    db.collection('settings').doc('payment_config').onSnapshot(doc => {
+        if (doc.exists) {
+            const data = doc.data();
+            document.getElementById('gatewayUrlInput').value = data.gatewayUrl || '';
+            document.getElementById('merchantIdInput').value = data.merchantId || '';
+            document.getElementById('bkashApiKeyInput').value = data.bkashApiKey || '';
+            document.getElementById('nagadApiKeyInput').value = data.nagadApiKey || '';
+        }
+    });
+
+    // 8. Verification Plans & Discount Configuration (settings/verification_plans)
+    function saveVerificationPlans() {
+        const monthlyPrice = parseInt(document.getElementById('monthlyPriceInput').value) || 50;
+        const discount6m = parseInt(document.getElementById('discount6mInput').value) || 15;
+        const discount12m = parseInt(document.getElementById('discount12mInput').value) || 30;
+
+        db.collection('settings').doc('verification_plans').set({
+            monthlyPrice: monthlyPrice,
+            discount6m: discount6m,
+            discount12m: discount12m,
+            updatedAt: firebase.firestore.Timestamp.now()
+        }, { merge: true })
+        .then(() => showAlert("ভেরিফিকেশন প্ল্যান ও ডিসকাউন্ট রেট সেভ হয়েছে!", true))
+        .catch((err) => showAlert("ত্রুটি: " + err.message, false));
+    }
+
+    function updatePlanCalculationPreview() {
+        const base = parseInt(document.getElementById('monthlyPriceInput').value) || 50;
+        const d6 = parseInt(document.getElementById('discount6mInput').value) || 15;
+        const d12 = parseInt(document.getElementById('discount12mInput').value) || 30;
+
+        const orig6 = base * 6;
+        const final6 = Math.ceil(orig6 * (1.0 - (d6 / 100.0)));
+
+        const orig12 = base * 12;
+        const final12 = Math.ceil(orig12 * (1.0 - (d12 / 100.0)));
+
+        document.getElementById('preview1M').innerText = `১ মাস: ৳${base}`;
+        document.getElementById('preview6M').innerHTML = `৬ মাস: <del>৳${orig6}</del> <strong>৳${final6}</strong> (${d6}% ছাড়)`;
+        document.getElementById('preview12M').innerHTML = `১ বছর: <del>৳${orig12}</del> <strong>৳${final12}</strong> (${d12}% ছাড়)`;
+    }
+
+    db.collection('settings').doc('verification_plans').onSnapshot(doc => {
+        if (doc.exists) {
+            const data = doc.data();
+            document.getElementById('monthlyPriceInput').value = data.monthlyPrice || 50;
+            document.getElementById('discount6mInput').value = data.discount6m || 15;
+            document.getElementById('discount12mInput').value = data.discount12m || 30;
+            updatePlanCalculationPreview();
         }
     });
 
