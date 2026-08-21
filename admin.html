@@ -9,17 +9,14 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
         body { background-color: #f0f4f2; color: #212121; min-height: 100vh; overflow-x: hidden; }
 
-        /* Top App Header */
         .top-header { background: linear-gradient(135deg, #F42A41 0%, #006A4E 100%); color: white; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 12px rgba(0, 106, 78, 0.2); position: sticky; top: 0; z-index: 100; }
         .header-title-box { display: flex; align-items: center; gap: 10px; }
         .header-title-box img { width: 34px; height: 34px; border-radius: 50%; background: white; padding: 2px; }
         .header-title-box h1 { font-size: 18px; font-weight: bold; }
         
-        /* 3-Dot Menu Button */
         .menu-btn { background: rgba(255, 255, 255, 0.2); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
         .menu-btn:hover { background: rgba(255, 255, 255, 0.35); }
 
-        /* Side Navigation Drawer */
         .drawer-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; display: none; backdrop-filter: blur(2px); }
         .drawer { position: fixed; top: 0; right: -290px; width: 280px; height: 100%; background: white; z-index: 1000; box-shadow: -4px 0 20px rgba(0,0,0,0.15); transition: right 0.3s ease; display: flex; flex-direction: column; }
         .drawer.open { right: 0; }
@@ -30,31 +27,30 @@
         .drawer-menu li a { display: flex; align-items: center; gap: 12px; padding: 14px 20px; color: #333; text-decoration: none; font-size: 14px; font-weight: 600; border-left: 4px solid transparent; transition: 0.2s; }
         .drawer-menu li a:hover, .drawer-menu li a.active { background: #e8f5e9; color: #006A4E; border-left-color: #006A4E; }
 
-        /* Container & Pages */
         .main-container { max-width: 720px; margin: 20px auto; padding: 0 16px 40px; }
         .page-section { display: none; }
         .page-section.active { display: block; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Cards & Forms */
         .card { background: white; border-radius: 14px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 14px rgba(0,0,0,0.06); border: 1px solid #e0eae5; }
         .card h2 { color: #006A4E; margin-bottom: 14px; font-size: 17px; border-bottom: 2px solid #006A4E; padding-bottom: 8px; display: flex; align-items: center; justify-content: space-between; }
         label { display: block; font-weight: bold; margin-top: 12px; font-size: 13px; color: #333; }
         input, select, textarea { width: 100%; padding: 11px; margin-top: 6px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; background: #fafafa; }
         input:focus, textarea:focus { border-color: #006A4E; outline: none; background: #fff; }
 
-        /* Rich Text Toolbar */
         .toolbar { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; margin-bottom: 6px; background: #eef2f5; padding: 8px; border-radius: 8px; border: 1px solid #d0d7de; }
         .tool-btn { background: #006A4E; color: white; border: none; padding: 6px 11px; border-radius: 5px; font-size: 12px; font-weight: bold; cursor: pointer; }
         .tool-btn:hover { background-color: #00523d; }
         .tool-btn-accent { background: #1877F2; }
         .tool-btn-yt { background: #FF0000; }
+        .tool-btn-phone { background: #004D36; }
+        .tool-btn-wa { background: #25D366; }
         
         .preview-box { border: 1px dashed #006A4E; background: #ffffff; padding: 14px; border-radius: 8px; margin-top: 8px; min-height: 80px; max-height: 280px; overflow-y: auto; font-size: 14px; line-height: 1.6; }
         .preview-box img { max-width: 100%; height: auto; border-radius: 6px; }
         .preview-box iframe { width: 100%; aspect-ratio: 16 / 9; border-radius: 8px; border: 0; margin: 8px 0; }
+        .preview-box .action-pill { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 14px; font-size: 13px; font-weight: bold; margin: 2px; }
 
-        /* Action Buttons */
         button.btn-primary { background: #006A4E; color: white; border: none; padding: 12px; border-radius: 8px; font-size: 15px; font-weight: bold; width: 100%; cursor: pointer; margin-top: 14px; }
         button.btn-primary:hover { background-color: #00523d; }
         button.btn-danger { background: #dc3545; color: white; }
@@ -66,7 +62,6 @@
         .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
         .alert-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
 
-        /* Items List */
         .item-card { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 10px; padding: 14px; margin-top: 10px; }
         .item-card h4 { margin-bottom: 4px; color: #006A4E; font-size: 16px; }
         .item-card p { margin: 3px 0; font-size: 13px; color: #555; }
@@ -74,36 +69,30 @@
         .btn-group button { width: 50%; padding: 9px; font-size: 13px; font-weight: bold; border-radius: 6px; border: none; cursor: pointer; }
         .badge { display: inline-block; background: #e8f5e9; color: #006A4E; padding: 3px 10px; border-radius: 14px; font-size: 11px; font-weight: bold; margin-bottom: 6px; }
 
-        /* Beautiful Loading Screen Animation */
         #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #ffffff; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.4s ease; }
         .pulse-logo { width: 90px; height: 90px; border-radius: 50%; box-shadow: 0 0 0 0 rgba(0, 106, 78, 0.7); animation: pulseRing 1.5s infinite; }
         @keyframes pulseRing { 0% { box-shadow: 0 0 0 0 rgba(0, 106, 78, 0.7); } 70% { box-shadow: 0 0 0 20px rgba(0, 106, 78, 0); } 100% { box-shadow: 0 0 0 0 rgba(0, 106, 78, 0); } }
         .loading-text { margin-top: 16px; font-size: 16px; font-weight: bold; color: #006A4E; letter-spacing: 0.5px; }
     </style>
 
-    <!-- Firebase SDK Compat -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
 
-<!-- Animated Loading Screen -->
 <div id="loadingOverlay">
-    <img src="flogo.png" alt="সহায়ক লোগো" class="pulse-logo" onerror="this.src='logo2.png'">
+    <img src="flogo.png" alt="सहায়ক লোগো" class="pulse-logo" onerror="this.src='logo2.png'">
     <div class="loading-text">ডাটাবেজের সাথে সংযোগ হচ্ছে...</div>
 </div>
 
-<!-- Top Navigation Header -->
 <div class="top-header">
     <div class="header-title-box">
         <img src="flogo.png" alt="Logo" onerror="this.src='logo2.png'">
         <h1 id="pageHeadingTitle">ড্যাশবোর্ড ও সেটিংস</h1>
     </div>
-    <!-- 3-Dot Side Drawer Menu Trigger Button -->
     <button id="btnMenuToggle" class="menu-btn" onclick="toggleDrawer()" title="মেনু">⋮</button>
 </div>
 
-<!-- Side Navigation Drawer -->
 <div id="drawerOverlay" class="drawer-overlay" onclick="toggleDrawer()"></div>
 <div id="sideDrawer" class="drawer">
     <div class="drawer-header">
@@ -124,9 +113,8 @@
 
     <div id="alertBox" class="alert"></div>
 
-    <!-- ================= PAGE 1: DASHBOARD & NOTICE ================= -->
+    <!-- PAGE 1: DASHBOARD & NOTICE -->
     <div id="pageDashboard" class="page-section active">
-        <!-- ImgBB API Key Card -->
         <div class="card" style="border: 1px solid #006A4E; background: #f0f7f4;">
             <h2>🔑 ImgBB ইমেজ আপলোড API Key</h2>
             <label for="imgbbApiKeyInput">ImgBB API Key (*):</label>
@@ -134,7 +122,6 @@
             <button class="btn-primary" onclick="saveImgbbApiKey()">API Key সেভ করুন</button>
         </div>
 
-        <!-- Scrolling Notice Card -->
         <div class="card">
             <h2>📢 স্ক্রলিং নোটিশ আপডেট (অ্যাপের ওপরের চিকন বার)</h2>
             <label for="newsInput">নোটিশ বার্তা:</label>
@@ -143,7 +130,7 @@
         </div>
     </div>
 
-    <!-- ================= PAGE 2: NEWS MANAGEMENT ================= -->
+    <!-- PAGE 2: NEWS MANAGEMENT -->
     <div id="pageNews" class="page-section">
         <div class="card">
             <h2>📰 নতুন খবর ও কভার যোগ করুন</h2>
@@ -156,20 +143,22 @@
             <label for="newsImageUrl">কভার ইমেজের লিংক (Image URL):</label>
             <input type="text" id="newsImageUrl" placeholder="যেমন: https://i.ibb.co/example.jpg">
 
-            <label for="newsDetail">সংবাদের বিস্তারিত বিবরণ:</label>
+            <label for="newsDetail">সংবাদের বিস্তারিত বিবরণ (নতুন টুলস সহ):</label>
             <div class="toolbar">
                 <button type="button" class="tool-btn" onclick="insertTagTarget('newsDetail', '<b>', '</b>')"><b>B</b> গাঢ়</button>
                 <button type="button" class="tool-btn" onclick="insertTagTarget('newsDetail', '<i>', '</i>')"><i>I</i> বাঁকা</button>
                 <button type="button" class="tool-btn" onclick="insertTagTarget('newsDetail', '<u>', '</u>')"><u>U</u> আন্ডারলাইন</button>
                 <button type="button" class="tool-btn" onclick="insertTagTarget('newsDetail', '<h1>', '</h1>')">H1 হেডিং</button>
                 <button type="button" class="tool-btn" onclick="insertTagTarget('newsDetail', '<br>\n', '')">↵ লাইন ব্রেক</button>
+                <button type="button" class="tool-btn tool-btn-phone" onclick="insertPhoneTag('newsDetail')">📞 ফোন</button>
+                <button type="button" class="tool-btn tool-btn-wa" onclick="insertWaTag('newsDetail')">💬 WhatsApp</button>
                 <button type="button" class="tool-btn tool-btn-accent" onclick="insertLinkTarget('newsDetail')">🔗 লিংক</button>
                 <button type="button" class="tool-btn tool-btn-accent" onclick="insertInlineImageTarget('newsDetail')">🖼️ ছবি</button>
                 <button type="button" class="tool-btn tool-btn-yt" onclick="insertYouTubeEmbedTarget('newsDetail')">🎥 YouTube</button>
                 <button type="button" class="tool-btn" onclick="insertTagTarget('newsDetail', '<li>', '</li>')">• বুলেট</button>
             </div>
 
-            <textarea id="newsDetail" rows="6" oninput="updateNewsPreview()" placeholder="সংবাদের বিস্তারিত বিষয়বস্তু এখানে লিখুন..."></textarea>
+            <textarea id="newsDetail" rows="7" oninput="updateNewsPreview()" placeholder="সংবাদের বিস্তারিত বিষয়বস্তু এখানে লিখুন..."></textarea>
 
             <label>লাইভ প্রিভিউ (Live Preview):</label>
             <div id="newsPreviewBox" class="preview-box"><i>এখানে খবরের লাইভ প্রিভিউ দেখা যাবে...</i></div>
@@ -183,7 +172,7 @@
         </div>
     </div>
 
-    <!-- ================= PAGE 3: OPEN CHAT ================= -->
+    <!-- PAGE 3: OPEN CHAT -->
     <div id="pageOpenChat" class="page-section">
         <div class="card">
             <h2>💬 ওপেন চ্যাটে পোস্ট প্রকাশ করুন</h2>
@@ -208,16 +197,14 @@
         </div>
     </div>
 
-    <!-- ================= PAGE 4: CONTACTS & APPROVALS ================= -->
+    <!-- PAGE 4: CONTACTS & APPROVALS -->
     <div id="pageContacts" class="page-section">
-        <!-- Pending Requests Card -->
         <div class="card" style="border: 2px solid #ff9800;">
             <h2 style="color: #ff9800;">⏳ পেন্ডিং কন্টাক্ট রিকোয়েস্ট (Pending Approvals)</h2>
             <p style="font-size:13px; color:#555; margin-bottom:10px;">ইউজারদের সাবমিট করা কন্টাক্ট যাচাই করে অনুমোদন বা বাতিল করুন।</p>
             <div id="pendingContactsContainer"><p style="text-align: center; color: #777;">লোড হচ্ছে...</p></div>
         </div>
 
-        <!-- Add Contact Card -->
         <div class="card">
             <h2 id="formTitle">➕ নতুন কন্টাক্ট যোগ করুন (সরাসরি পাবলিশ হবে)</h2>
             <input type="hidden" id="editKey">
@@ -259,14 +246,13 @@
             <button id="cancelBtn" class="btn-cancel" onclick="resetForm()" style="display:none; width: 100%;">ক্যানসেল করুন</button>
         </div>
 
-        <!-- Approved Contacts List -->
         <div class="card">
             <h2>📑 অনুমোদিত সকল কন্টাক্ট তালিকা</h2>
             <div id="contactsContainer"><p style="text-align: center; color: #777;">লোড হচ্ছে...</p></div>
         </div>
     </div>
 
-    <!-- ================= PAGE 5: TERMS & RULES ================= -->
+    <!-- PAGE 5: TERMS & RULES -->
     <div id="pageTerms" class="page-section">
         <div class="card">
             <h2>📜 ব্যবহার নির্দেশিকা ও শর্তাবলী এডিটর</h2>
@@ -278,6 +264,8 @@
                 <button type="button" class="tool-btn" onclick="insertTagTarget('termsContentInput', '<u>', '</u>')"><u>U</u> আন্ডারলাইন</button>
                 <button type="button" class="tool-btn" onclick="insertTagTarget('termsContentInput', '<h1>', '</h1>')">H1 হেডিং</button>
                 <button type="button" class="tool-btn" onclick="insertTagTarget('termsContentInput', '<br>\n', '')">↵ লাইন ব্রেক</button>
+                <button type="button" class="tool-btn tool-btn-phone" onclick="insertPhoneTag('termsContentInput')">📞 ফোন</button>
+                <button type="button" class="tool-btn tool-btn-wa" onclick="insertWaTag('termsContentInput')">💬 WhatsApp</button>
                 <button type="button" class="tool-btn tool-btn-accent" onclick="insertLinkTarget('termsContentInput')">🔗 লিংক</button>
                 <button type="button" class="tool-btn tool-btn-accent" onclick="insertInlineImageTarget('termsContentInput')">🖼️ ছবি</button>
                 <button type="button" class="tool-btn tool-btn-yt" onclick="insertYouTubeEmbedTarget('termsContentInput')">🎥 YouTube</button>
@@ -293,15 +281,14 @@
         </div>
     </div>
 
-    <!-- ================= PAGE 6: PAYMENT & PLAN SETTINGS ================= -->
+    <!-- PAGE 6: PAYMENT & PLAN SETTINGS -->
     <div id="pagePaymentPlan" class="page-section">
-        <!-- Payment Gateway Credentials Card -->
         <div class="card" style="border: 1px solid #006A4E;">
             <h2>💳 বিকাশ ও নগদ পেমেন্ট গেটওয়ে কনফিগারেশন</h2>
             <p style="font-size: 13px; color: #555; margin-bottom: 6px;">অ্যাপে চেকআউট পেজের রিয়েলটাইম পেমেন্ট রিকোয়েস্ট চালানোর জন্য গেটওয়ে ক্রেডেনশিয়াল সেভ করুন।</p>
 
             <label for="gatewayUrlInput">পেমেন্ট গেটওয়ে বেস ইউআরএল (Domain URL):</label>
-            <input type="text" id="gatewayUrlInput" placeholder="যেমন: https://app-sahayak.vercel.app">
+            <input type="text" id="gatewayUrlInput" placeholder="যেমন: https://pay-p2p.vercel.app">
 
             <label for="merchantIdInput">মার্চেন্ট আইডি (Merchant ID *):</label>
             <input type="text" id="merchantIdInput" placeholder="যেমন: MER-123456">
@@ -315,7 +302,6 @@
             <button class="btn-primary" onclick="savePaymentConfig()">পেমেন্ট গেটওয়ে সেটিংস সেভ করুন</button>
         </div>
 
-        <!-- Verification Plans & Pricing Card -->
         <div class="card">
             <h2>🛡️ ভেরিফিকেশন সাবস্ক্রিপশন প্ল্যান ও ডিসকাউন্ট রেট</h2>
             <p style="font-size: 13px; color: #555; margin-bottom: 8px;">১ মাস, ৬ মাস ও ১ বছরের প্ল্যানের দাম এবং ডিসকাউন্ট পার্সেন্টেজ নির্ধারণ করুন।</p>
@@ -329,7 +315,6 @@
             <label for="discount12mInput">১ বছরের ডিসকাউন্ট পার্সেন্ট (%):</label>
             <input type="number" id="discount12mInput" oninput="updatePlanCalculationPreview()" placeholder="যেমন: 30">
 
-            <!-- Live Calculation Preview Box -->
             <label style="margin-top: 16px;">📊 লাইভ প্রাইস ক্যালকুলেশন প্রিভিউ (অ্যাপে যেমন দেখাবে):</label>
             <div class="preview-box" style="background: #fdfdfd; min-height: auto;">
                 <p id="preview1M" style="color: #006A4E; font-size: 15px; margin-bottom: 6px; font-weight: bold;">১ মাস: ৳৫০</p>
@@ -358,7 +343,6 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    // Hide Loading Animation once initial data connection establishes
     window.addEventListener('load', () => {
         setTimeout(() => {
             const loader = document.getElementById('loadingOverlay');
@@ -367,7 +351,6 @@
         }, 600);
     });
 
-    // 3-Dot Drawer Toggle
     function toggleDrawer() {
         const drawer = document.getElementById('sideDrawer');
         const overlay = document.getElementById('drawerOverlay');
@@ -381,7 +364,6 @@
         }
     }
 
-    // Single Page Tab Switcher
     function switchPage(pageId, title, element) {
         document.querySelectorAll('.page-section').forEach(page => page.classList.remove('active'));
         document.getElementById(pageId).classList.add('active');
@@ -401,7 +383,6 @@
         setTimeout(() => { alertBox.style.display = 'none'; }, 4000);
     }
 
-    // Rich Text Toolbar Target Handlers
     function insertTagTarget(targetId, startTag, endTag) {
         const textarea = document.getElementById(targetId);
         const start = textarea.selectionStart;
@@ -412,6 +393,22 @@
         textarea.value = textarea.value.substring(0, start) + replacement + textarea.value.substring(end);
         if (targetId === 'newsDetail') updateNewsPreview();
         if (targetId === 'termsContentInput') updateTermsPreview();
+    }
+
+    // Phone Tag Tool
+    function insertPhoneTag(targetId) {
+        const num = prompt("ফোন নম্বর প্রদান করুন (যেমন: 01711XXXXXX):", "017");
+        if (num) {
+            insertTagTarget(targetId, `<phone>${num.trim()}</phone>`, '');
+        }
+    }
+
+    // WhatsApp Tag Tool
+    function insertWaTag(targetId) {
+        const num = prompt("WhatsApp নম্বর প্রদান করুন (যেমন: 01711XXXXXX):", "017");
+        if (num) {
+            insertTagTarget(targetId, `<wa>${num.trim()}</wa>`, '');
+        }
     }
 
     function insertLinkTarget(targetId) {
@@ -427,7 +424,6 @@
         if (imgUrl) insertTagTarget(targetId, `<img src="${imgUrl}" alt="ছবি" />`, '');
     }
 
-    // YouTube Embed Tool - Converts URL / Iframe to responsive container
     function insertYouTubeEmbedTarget(targetId) {
         const input = prompt("ইউটিউব ভিডিও লিংক (URL) বা আইফ্রেম কোড দিন:\n(যেমন: https://www.youtube.com/watch?v=... বা https://youtu.be/...)");
         if (!input) return;
@@ -442,22 +438,31 @@
 
         if (match && match[2].length === 11) {
             const videoId = match[2];
-            const embedHtml = `\n<div class="video-container"><iframe src="https://www.youtube.com/embed/${videoId}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>\n`;
+            const embedHtml = `\n<div class="video-container"><iframe src="https://www.youtube.com/embed/${videoId}?enablejsapi=1&origin=https://app-sahayak.vercel.app&playsinline=1" referrerpolicy="strict-origin-when-cross-origin" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>\n`;
             insertTagTarget(targetId, embedHtml, '');
         } else {
             alert("সঠিক ইউটিউব ভিডিও লিংক প্রদান করুন!");
         }
     }
 
+    function parseCustomTagsForPreview(text) {
+        let parsed = text || '';
+        parsed = parsed.replace(/<phone>(.*?)<\/phone>/gi, '<span class="action-pill" style="background:#E8F5E9; color:#006A4E; border:1px solid #006A4E;">📞 $1</span>');
+        parsed = parsed.replace(/<wa>(.*?)<\/wa>/gi, '<span class="action-pill" style="background:#E8F8F0; color:#25D366; border:1px solid #25D366;">💬 $1 (WhatsApp)</span>');
+        return parsed;
+    }
+
     function updateNewsPreview() {
-        document.getElementById('newsPreviewBox').innerHTML = document.getElementById('newsDetail').value || '<i>এখানে খবরের লাইভ প্রিভিউ দেখা যাবে...</i>';
+        const raw = document.getElementById('newsDetail').value;
+        document.getElementById('newsPreviewBox').innerHTML = parseCustomTagsForPreview(raw) || '<i>এখানে খবরের লাইভ প্রিভিউ দেখা যাবে...</i>';
     }
 
     function updateTermsPreview() {
-        document.getElementById('termsPreviewBox').innerHTML = document.getElementById('termsContentInput').value || '<i>এখানে শর্তাবলীর লাইভ প্রিভিউ দেখা যাবে...</i>';
+        const raw = document.getElementById('termsContentInput').value;
+        document.getElementById('termsPreviewBox').innerHTML = parseCustomTagsForPreview(raw) || '<i>এখানে শর্তাবলীর লাইভ প্রিভিউ দেখা যাবে...</i>';
     }
 
-    // 1. ImgBB API Key
+    // ImgBB
     function saveImgbbApiKey() {
         const apiKey = document.getElementById('imgbbApiKeyInput').value.trim();
         if (!apiKey) return showAlert("API Key দিন!", false);
@@ -466,7 +471,7 @@
     }
     db.collection('settings').doc('config').onSnapshot(doc => { if (doc.exists && doc.data().imgbbApiKey) document.getElementById('imgbbApiKeyInput').value = doc.data().imgbbApiKey; });
 
-    // 2. Scrolling Notice
+    // Notice
     function updateNotice() {
         const text = document.getElementById('newsInput').value;
         db.collection('settings').doc('notice').set({ text: text, updatedAt: firebase.firestore.Timestamp.now() })
@@ -474,7 +479,7 @@
     }
     db.collection('settings').doc('notice').onSnapshot(doc => { if (doc.exists) document.getElementById('newsInput').value = doc.data().text || ''; });
 
-    // 3. News Publish
+    // News
     function publishNewsArticle() {
         const title = document.getElementById('newsTitle').value;
         const reporter = document.getElementById('newsReporter').value;
@@ -519,7 +524,7 @@
     });
     function deleteNews(id) { if (confirm("সংবাদটি মুছে ফেলতে চান?")) db.collection('news_list').doc(id).delete(); }
 
-    // 4. Open Chat Post & Moderation
+    // Open Chat
     function postToOpenChat() {
         const uid = document.getElementById('adminChatUid').value.trim() || 'admin_user';
         const name = document.getElementById('adminChatName').value.trim() || 'লালপুরবাসী';
@@ -561,7 +566,7 @@
     }
     function deleteOpenChatPost(key) { if (confirm("পোস্টটি মুছে ফেলতে চান?")) db.collection('openchat').doc(key).delete(); }
 
-    // 5. Contacts & Approvals
+    // Contacts
     function saveContact() {
         const editKey = document.getElementById('editKey').value;
         const category = document.getElementById('category').value;
@@ -615,7 +620,7 @@
     db.collection('contacts').where('isApproved', '==', true).onSnapshot(snapshot => {
         const container = document.getElementById('contactsContainer');
         container.innerHTML = '';
-        if (snapshot.empty) return container.innerHTML = '<p style="text-align: center; color: #777;">কোনো কন্টাক্ট নেই।</p>';
+        if (snapshot.empty) return container.innerHTML = '<p style="text-align: center;">কোনো কন্টাক্ট নেই।</p>';
         snapshot.forEach(doc => {
             const key = doc.id;
             const item = doc.data();
@@ -627,7 +632,7 @@
                 <p><strong>বিবরণ:</strong> ${escapeHtml(item.title)} | <strong>মোবাইল:</strong> ${escapeHtml(item.phone)}</p>
                 <div class="btn-group">
                     <button class="btn-warning" onclick="editContact('${key}', '${escapeJs(item.category)}', '${escapeJs(item.name)}', '${escapeJs(item.title)}', '${escapeJs(item.phone)}', '${escapeJs(item.location)}', '${escapeJs(item.whatsapp||'')}', '${escapeJs(item.facebook||'')}')">এডিট</button>
-                    <button class="btn-danger" onclick="rejectContact('${key}')">মুছে ফেলুন</button>
+                    <button class="btn-danger" onclick="deleteContact('${key}')">মুছে ফেলুন</button>
                 </div>
             `;
             container.appendChild(card);
@@ -662,7 +667,7 @@
         document.getElementById('cancelBtn').style.display = "none";
     }
 
-    // 6. Terms & Rules Editor
+    // Terms & Rules
     function saveTermsSettings() {
         const content = document.getElementById('termsContentInput').value;
         db.collection('settings').doc('terms').set({ content: content, updatedAt: firebase.firestore.Timestamp.now() }, { merge: true })
@@ -676,7 +681,7 @@
         }
     });
 
-    // 7. Payment Gateway Configuration (settings/payment_config)
+    // Payment Config
     function savePaymentConfig() {
         const gatewayUrl = document.getElementById('gatewayUrlInput').value.trim();
         const merchantId = document.getElementById('merchantIdInput').value.trim();
@@ -686,7 +691,7 @@
         if (!merchantId) return showAlert("মার্চেন্ট আইডি প্রদান করুন!", false);
 
         db.collection('settings').doc('payment_config').set({
-            gatewayUrl: gatewayUrl || 'https://app-sahayak.vercel.app',
+            gatewayUrl: gatewayUrl || 'https://pay-p2p.vercel.app',
             merchantId: merchantId,
             bkashApiKey: bkashApiKey,
             nagadApiKey: nagadApiKey,
@@ -706,7 +711,7 @@
         }
     });
 
-    // 8. Verification Plans & Discount Configuration (settings/verification_plans)
+    // Verification Plans
     function saveVerificationPlans() {
         const monthlyPrice = parseInt(document.getElementById('monthlyPriceInput').value) || 50;
         const discount6m = parseInt(document.getElementById('discount6mInput').value) || 15;
