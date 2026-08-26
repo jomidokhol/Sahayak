@@ -5,74 +5,527 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>সহায়ক - লালপুর এডমিন ড্যাশবোর্ড</title>
     <link rel="icon" href="flogo.png">
+    
+    <!-- Google Fonts for Modern Bengali & English Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
-        body { background-color: #f0f4f2; color: #212121; min-height: 100vh; overflow-x: hidden; }
+        :root {
+            --primary: #006A4E;
+            --primary-dark: #00503a;
+            --primary-light: #e8f5f1;
+            --accent-red: #F42A41;
+            --bg-page: #f8fafc;
+            --surface: #ffffff;
+            --border: #e2e8f0;
+            --border-focus: #006A4E;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --radius-lg: 16px;
+            --radius-md: 10px;
+            --radius-sm: 6px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 20px -2px rgba(0,0,0,0.08);
+            --shadow-lg: 0 10px 30px -4px rgba(0, 106, 78, 0.12);
+        }
 
-        .top-header { background: linear-gradient(135deg, #F42A41 0%, #006A4E 100%); color: white; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 12px rgba(0, 106, 78, 0.2); position: sticky; top: 0; z-index: 100; }
-        .header-title-box { display: flex; align-items: center; gap: 10px; }
-        .header-title-box img { width: 34px; height: 34px; border-radius: 50%; background: white; padding: 2px; }
-        .header-title-box h1 { font-size: 18px; font-weight: bold; }
-        
-        .menu-btn { background: rgba(255, 255, 255, 0.2); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-        .menu-btn:hover { background: rgba(255, 255, 255, 0.35); }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', 'Hind Siliguri', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-        .drawer-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; display: none; backdrop-filter: blur(2px); }
-        .drawer { position: fixed; top: 0; right: -290px; width: 280px; height: 100%; background: white; z-index: 1000; box-shadow: -4px 0 20px rgba(0,0,0,0.15); transition: right 0.3s ease; display: flex; flex-direction: column; }
+        body {
+            background-color: var(--bg-page);
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.5;
+        }
+
+        /* Top Header */
+        .top-header {
+            background: linear-gradient(135deg, #006A4E 0%, #004d36 60%, #F42A41 120%);
+            color: white;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 20px rgba(0, 106, 78, 0.25);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-title-box {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-title-box img {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: #ffffff;
+            padding: 2px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            object-fit: cover;
+        }
+
+        .header-text-group h1 {
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: -0.2px;
+        }
+
+        .header-text-group span {
+            font-size: 11px;
+            opacity: 0.85;
+            display: block;
+            margin-top: -1px;
+        }
+
+        .menu-btn {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            color: white;
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .menu-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.03);
+        }
+
+        /* Modern Slide-out Drawer */
+        .drawer-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            z-index: 999;
+            display: none;
+            backdrop-filter: blur(4px);
+            transition: opacity 0.3s ease;
+        }
+
+        .drawer {
+            position: fixed;
+            top: 0;
+            right: -320px;
+            width: 300px;
+            height: 100%;
+            background: var(--surface);
+            z-index: 1000;
+            box-shadow: -10px 0 35px rgba(0,0,0,0.15);
+            transition: right 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            flex-direction: column;
+        }
+
         .drawer.open { right: 0; }
-        .drawer-header { background: #006A4E; color: white; padding: 24px 18px; }
-        .drawer-header h3 { font-size: 18px; }
-        .drawer-header p { font-size: 12px; opacity: 0.85; margin-top: 4px; }
-        .drawer-menu { list-style: none; padding: 12px 0; flex: 1; overflow-y: auto; }
-        .drawer-menu li a { display: flex; align-items: center; gap: 12px; padding: 14px 20px; color: #333; text-decoration: none; font-size: 14px; font-weight: 600; border-left: 4px solid transparent; transition: 0.2s; }
-        .drawer-menu li a:hover, .drawer-menu li a.active { background: #e8f5e9; color: #006A4E; border-left-color: #006A4E; }
 
-        .main-container { max-width: 720px; margin: 20px auto; padding: 0 16px 40px; }
+        .drawer-header {
+            background: linear-gradient(135deg, #006A4E 0%, #004d36 100%);
+            color: white;
+            padding: 28px 22px;
+            position: relative;
+        }
+
+        .drawer-header h3 {
+            font-size: 19px;
+            font-weight: 700;
+        }
+
+        .drawer-header p {
+            font-size: 12.5px;
+            opacity: 0.85;
+            margin-top: 4px;
+        }
+
+        .drawer-menu {
+            list-style: none;
+            padding: 16px 12px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .drawer-menu li {
+            margin-bottom: 6px;
+        }
+
+        .drawer-menu li a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: #334155;
+            text-decoration: none;
+            font-size: 14.5px;
+            font-weight: 600;
+            border-radius: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .drawer-menu li a:hover {
+            background: #f1f5f9;
+            color: var(--primary);
+            transform: translateX(4px);
+        }
+
+        .drawer-menu li a.active {
+            background: var(--primary-light);
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        /* Container & Grid */
+        .main-container {
+            max-width: 780px;
+            margin: 24px auto;
+            padding: 0 16px 60px;
+        }
+
         .page-section { display: none; }
-        .page-section.active { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        .page-section.active {
+            display: block;
+            animation: fadeInPage 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
 
-        .card { background: white; border-radius: 14px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 14px rgba(0,0,0,0.06); border: 1px solid #e0eae5; }
-        .card h2 { color: #006A4E; margin-bottom: 14px; font-size: 17px; border-bottom: 2px solid #006A4E; padding-bottom: 8px; display: flex; align-items: center; justify-content: space-between; }
-        label { display: block; font-weight: bold; margin-top: 12px; font-size: 13px; color: #333; }
-        input, select, textarea { width: 100%; padding: 11px; margin-top: 6px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; background: #fafafa; }
-        input:focus, textarea:focus { border-color: #006A4E; outline: none; background: #fff; }
+        @keyframes fadeInPage {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-        .toolbar { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; margin-bottom: 6px; background: #eef2f5; padding: 8px; border-radius: 8px; border: 1px solid #d0d7de; }
-        .tool-btn { background: #006A4E; color: white; border: none; padding: 6px 11px; border-radius: 5px; font-size: 12px; font-weight: bold; cursor: pointer; }
-        .tool-btn:hover { background-color: #00523d; }
-        .tool-btn-accent { background: #1877F2; }
-        .tool-btn-yt { background: #FF0000; }
-        .tool-btn-phone { background: #004D36; }
-        .tool-btn-wa { background: #25D366; }
-        
-        .preview-box { border: 1px dashed #006A4E; background: #ffffff; padding: 14px; border-radius: 8px; margin-top: 8px; min-height: 80px; max-height: 280px; overflow-y: auto; font-size: 14px; line-height: 1.6; }
-        .preview-box img { max-width: 100%; height: auto; border-radius: 6px; }
-        .preview-box iframe { width: 100%; aspect-ratio: 16 / 9; border-radius: 8px; border: 0; margin: 8px 0; }
-        .preview-box .action-pill { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 14px; font-size: 13px; font-weight: bold; margin: 2px; }
+        /* Floating Cards */
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            padding: 22px;
+            margin-bottom: 22px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            transition: box-shadow 0.25s ease;
+        }
 
-        button.btn-primary { background: #006A4E; color: white; border: none; padding: 12px; border-radius: 8px; font-size: 15px; font-weight: bold; width: 100%; cursor: pointer; margin-top: 14px; }
-        button.btn-primary:hover { background-color: #00523d; }
-        button.btn-danger { background: #dc3545; color: white; }
-        button.btn-success { background: #28a745; color: white; }
-        button.btn-warning { background: #ffc107; color: #212121; }
-        button.btn-cancel { background: #6c757d; color: white; margin-top: 8px; }
+        .card:hover {
+            box-shadow: var(--shadow-md);
+        }
 
-        .alert { padding: 12px; border-radius: 8px; font-weight: bold; margin-bottom: 16px; display: none; text-align: center; font-size: 14px; }
-        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .alert-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .card h2 {
+            color: var(--primary);
+            margin-bottom: 14px;
+            font-size: 16.5px;
+            font-weight: 700;
+            border-bottom: 1.5px solid #edf2f7;
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
 
-        .item-card { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 10px; padding: 14px; margin-top: 10px; }
-        .item-card h4 { margin-bottom: 4px; color: #006A4E; font-size: 16px; }
-        .item-card p { margin: 3px 0; font-size: 13px; color: #555; }
-        .btn-group { display: flex; gap: 8px; margin-top: 10px; }
-        .btn-group button { width: 50%; padding: 9px; font-size: 13px; font-weight: bold; border-radius: 6px; border: none; cursor: pointer; }
-        .badge { display: inline-block; background: #e8f5e9; color: #006A4E; padding: 3px 10px; border-radius: 14px; font-size: 11px; font-weight: bold; margin-bottom: 6px; }
+        /* Form Controls */
+        label {
+            display: block;
+            font-weight: 600;
+            margin-top: 14px;
+            font-size: 13.5px;
+            color: #334155;
+        }
 
-        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #ffffff; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.4s ease; }
-        .pulse-logo { width: 90px; height: 90px; border-radius: 50%; box-shadow: 0 0 0 0 rgba(0, 106, 78, 0.7); animation: pulseRing 1.5s infinite; }
-        @keyframes pulseRing { 0% { box-shadow: 0 0 0 0 rgba(0, 106, 78, 0.7); } 70% { box-shadow: 0 0 0 20px rgba(0, 106, 78, 0); } 100% { box-shadow: 0 0 0 0 rgba(0, 106, 78, 0); } }
-        .loading-text { margin-top: 16px; font-size: 16px; font-weight: bold; color: #006A4E; letter-spacing: 0.5px; }
+        input, select, textarea {
+            width: 100%;
+            padding: 11px 14px;
+            margin-top: 6px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            color: var(--text-main);
+            background: #f8fafc;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--border-focus);
+            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(0, 106, 78, 0.1);
+        }
+
+        /* Editor Toolbar */
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin: 8px 0;
+            background: #f1f5f9;
+            padding: 8px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+        }
+
+        .tool-btn {
+            background: #ffffff;
+            color: #334155;
+            border: 1px solid #cbd5e1;
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .tool-btn:hover {
+            background-color: var(--primary);
+            color: #ffffff;
+            border-color: var(--primary);
+        }
+
+        .tool-btn-accent { background: #3b82f6; color: #fff; border-color: #2563eb; }
+        .tool-btn-accent:hover { background: #1d4ed8; }
+        .tool-btn-yt { background: #ef4444; color: #fff; border-color: #dc2626; }
+        .tool-btn-yt:hover { background: #b91c1c; }
+        .tool-btn-phone { background: #006A4E; color: #fff; border-color: #00503a; }
+        .tool-btn-phone:hover { background: #00402e; }
+        .tool-btn-wa { background: #10b981; color: #fff; border-color: #059669; }
+        .tool-btn-wa:hover { background: #047857; }
+
+        /* Preview Box */
+        .preview-box {
+            border: 1.5px dashed var(--primary);
+            background: #f8fafc;
+            padding: 16px;
+            border-radius: var(--radius-md);
+            margin-top: 8px;
+            min-height: 90px;
+            max-height: 320px;
+            overflow-y: auto;
+            font-size: 14.5px;
+            line-height: 1.7;
+        }
+
+        .preview-box img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 8px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .preview-box iframe {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            border-radius: 10px;
+            border: 0;
+            margin: 10px 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .preview-box .action-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            margin: 4px 2px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        /* Buttons */
+        button.btn-primary {
+            background: linear-gradient(135deg, #006A4E 0%, #00523d 100%);
+            color: white;
+            border: none;
+            padding: 13px 18px;
+            border-radius: var(--radius-md);
+            font-size: 15px;
+            font-weight: 700;
+            width: 100%;
+            cursor: pointer;
+            margin-top: 16px;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 12px rgba(0, 106, 78, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        button.btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(0, 106, 78, 0.3);
+        }
+
+        button.btn-primary:active {
+            transform: translateY(1px);
+        }
+
+        button.btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+        button.btn-danger:hover { background: #dc2626; }
+
+        button.btn-success {
+            background: #10b981;
+            color: white;
+        }
+        button.btn-success:hover { background: #059669; }
+
+        button.btn-warning {
+            background: #f59e0b;
+            color: #ffffff;
+        }
+        button.btn-warning:hover { background: #d97706; }
+
+        button.btn-cancel {
+            background: #64748b;
+            color: white;
+            margin-top: 10px;
+            border: none;
+            padding: 11px;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 14px 18px;
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: none;
+            text-align: center;
+            font-size: 14px;
+            animation: slideDown 0.3s ease;
+            box-shadow: var(--shadow-sm);
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .alert-success { background: #ecfdf5; color: #065f46; border: 1.5px solid #a7f3d0; }
+        .alert-error { background: #fef2f2; color: #991b1b; border: 1.5px solid #fecaca; }
+
+        /* Dynamic Item Cards */
+        .item-card {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            margin-top: 12px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+            transition: all 0.2s ease;
+        }
+
+        .item-card:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .item-card h4 {
+            margin-bottom: 6px;
+            color: #0f172a;
+            font-size: 15.5px;
+            font-weight: 700;
+        }
+
+        .item-card p {
+            margin: 4px 0;
+            font-size: 13.5px;
+            color: var(--text-muted);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .btn-group button {
+            width: 50%;
+            padding: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            border-radius: var(--radius-sm);
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .badge {
+            display: inline-block;
+            background: var(--primary-light);
+            color: var(--primary);
+            padding: 3px 12px;
+            border-radius: 50px;
+            font-size: 11.5px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            border: 1px solid rgba(0, 106, 78, 0.15);
+        }
+
+        /* Loading Screen */
+        #loadingOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #ffffff;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.4s ease;
+        }
+
+        .pulse-logo {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            animation: pulseGlow 1.8s infinite;
+        }
+
+        @keyframes pulseGlow {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 106, 78, 0.6); }
+            70% { transform: scale(1); box-shadow: 0 0 0 24px rgba(0, 106, 78, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 106, 78, 0); }
+        }
+
+        .loading-text {
+            margin-top: 18px;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: 0.3px;
+        }
     </style>
 
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -81,27 +534,30 @@
 <body>
 
 <div id="loadingOverlay">
-    <img src="flogo.png" alt="सहায়ক লোগো" class="pulse-logo" onerror="this.src='logo2.png'">
+    <img src="flogo.png" alt="সহায়ক লোগো" class="pulse-logo" onerror="this.src='logo2.png'">
     <div class="loading-text">ডাটাবেজের সাথে সংযোগ হচ্ছে...</div>
 </div>
 
 <div class="top-header">
     <div class="header-title-box">
         <img src="flogo.png" alt="Logo" onerror="this.src='logo2.png'">
-        <h1 id="pageHeadingTitle">ড্যাশবোর্ড ও সেটিংস</h1>
+        <div class="header-text-group">
+            <h1 id="pageHeadingTitle">ড্যাশবোর্ড ও সেটিংস</h1>
+            <span>সহায়ক এডমিন প্যানেল</span>
+        </div>
     </div>
-    <button id="btnMenuToggle" class="menu-btn" onclick="toggleDrawer()" title="মেনু">⋮</button>
+    <button id="btnMenuToggle" class="menu-btn" onclick="toggleDrawer()" title="মেনু">☰</button>
 </div>
 
 <div id="drawerOverlay" class="drawer-overlay" onclick="toggleDrawer()"></div>
 <div id="sideDrawer" class="drawer">
     <div class="drawer-header">
-        <h3>সহায়ক এডমিন প্যানেল</h3>
-        <p>লালপুর উপজেলা ডিজিটাল কন্ট্রোল</p>
+        <h3>সহায়ক এডমিন</h3>
+        <p>লালপুর উপজেলা ডিজিটাল কন্ট্রোল প্যানেল</p>
     </div>
     <ul class="drawer-menu">
         <li><a href="#dashboard" class="active" onclick="switchPage('pageDashboard', 'ড্যাশবোর্ড ও সেটিংস', this)">🏠 ড্যাশবোর্ড ও নোটিশ</a></li>
-        <li><a href="#news" onclick="switchPage('pageNews', 'খবর ও সংবাদ প্রকাশ', this)">📰 সংবাদ ও খবর প্রকাশ</a></li>
+        <li><a href="#news" onclick="switchPage('pageNews', 'সংবাদ ও খবর প্রকাশ', this)">📰 সংবাদ ও খবর প্রকাশ</a></li>
         <li><a href="#openchat" onclick="switchPage('pageOpenChat', 'ওপেন চ্যাট মডারেশন', this)">💬 ওপেন চ্যাট মডারেশন</a></li>
         <li><a href="#contacts" onclick="switchPage('pageContacts', 'কন্টাক্ট ও এপ্রুভাল', this)">📞 কন্টাক্ট ও এপ্রুভাল</a></li>
         <li><a href="#terms" onclick="switchPage('pageTerms', 'ব্যবহার নির্দেশিকা ও শর্তাবলী', this)">📜 নিয়মাবলি ও শর্তাবলী</a></li>
@@ -115,18 +571,18 @@
 
     <!-- PAGE 1: DASHBOARD & NOTICE -->
     <div id="pageDashboard" class="page-section active">
-        <div class="card" style="border: 1px solid #006A4E; background: #f0f7f4;">
+        <div class="card" style="border-left: 4px solid var(--primary); background: #ffffff;">
             <h2>🔑 ImgBB ইমেজ আপলোড API Key</h2>
             <label for="imgbbApiKeyInput">ImgBB API Key (*):</label>
             <input type="text" id="imgbbApiKeyInput" placeholder="আপনার ImgBB API Key পেস্ট করুন">
-            <button class="btn-primary" onclick="saveImgbbApiKey()">API Key সেভ করুন</button>
+            <button class="btn-primary" onclick="saveImgbbApiKey()">💾 API Key সেভ করুন</button>
         </div>
 
-        <div class="card">
+        <div class="card" style="border-left: 4px solid #F42A41;">
             <h2>📢 স্ক্রলিং নোটিশ আপডেট (অ্যাপের ওপরের চিকন বার)</h2>
             <label for="newsInput">নোটিশ বার্তা:</label>
             <textarea id="newsInput" rows="3" placeholder="যেমন: আগামী কাল লালপুরে বিদ্যুৎ সরবরাহ বন্ধ থাকবে..."></textarea>
-            <button class="btn-primary" onclick="updateNotice()">নোটিশ সেভ করুন</button>
+            <button class="btn-primary" onclick="updateNotice()">📢 নোটিশ সেভ করুন</button>
         </div>
     </div>
 
@@ -163,12 +619,12 @@
             <label>লাইভ প্রিভিউ (Live Preview):</label>
             <div id="newsPreviewBox" class="preview-box"><i>এখানে খবরের লাইভ প্রিভিউ দেখা যাবে...</i></div>
 
-            <button class="btn-primary" onclick="publishNewsArticle()">খবর পাবলিশ করুন</button>
+            <button class="btn-primary" onclick="publishNewsArticle()">🚀 খবর পাবলিশ করুন</button>
         </div>
 
         <div class="card">
             <h2>📑 প্রকাশিত খবরের তালিকা</h2>
-            <div id="publishedNewsContainer"><p style="text-align: center; color: #777;">লোড হচ্ছে...</p></div>
+            <div id="publishedNewsContainer"><p style="text-align: center; color: var(--text-muted); padding: 14px;">লোড হচ্ছে...</p></div>
         </div>
     </div>
 
@@ -176,7 +632,7 @@
     <div id="pageOpenChat" class="page-section">
         <div class="card">
             <h2>💬 ওপেন চ্যাটে পোস্ট প্রকাশ করুন</h2>
-            <div style="background: #eef9f5; border: 1px solid #28a745; padding: 14px; border-radius: 8px;">
+            <div style="background: #f8fafc; border: 1.5px solid #cbd5e1; padding: 16px; border-radius: 12px;">
                 <label for="adminChatUid">কাস্টম UID (ঐচ্ছিক - ফাঁকা রাখলে 'admin' হবে):</label>
                 <input type="text" id="adminChatUid" placeholder="যেমন: UID_123456">
 
@@ -186,23 +642,23 @@
                 <label for="adminChatContent">পোস্টের বার্তা (*):</label>
                 <textarea id="adminChatContent" rows="3" placeholder="ওপেন চ্যাটে পোস্টের বার্তা লিখুন..."></textarea>
 
-                <button class="btn-primary" onclick="postToOpenChat()" style="background: #28a745; margin-top: 10px;">পোস্ট প্রকাশ করুন</button>
+                <button class="btn-primary" onclick="postToOpenChat()" style="margin-top: 14px;">💬 পোস্ট প্রকাশ করুন</button>
             </div>
         </div>
 
         <div class="card">
             <h2>📋 ওপেন চ্যাট পোস্টসমূহ ও মডারেশন</h2>
-            <button class="btn-primary" onclick="loadOpenChatPosts()" style="background: #2196F3; margin-bottom: 12px; margin-top:0;">পোস্ট তালিকা রিফ্রেশ 🔄</button>
-            <div id="openChatPostsContainer"><p style="text-align: center; color: #777;">লোড হচ্ছে...</p></div>
+            <button class="btn-primary" onclick="loadOpenChatPosts()" style="background: #0284c7; margin-bottom: 14px; margin-top:0;">🔄 পোস্ট তালিকা রিফ্রেশ করুন</button>
+            <div id="openChatPostsContainer"><p style="text-align: center; color: var(--text-muted); padding: 14px;">লোড হচ্ছে...</p></div>
         </div>
     </div>
 
     <!-- PAGE 4: CONTACTS & APPROVALS -->
     <div id="pageContacts" class="page-section">
-        <div class="card" style="border: 2px solid #ff9800;">
-            <h2 style="color: #ff9800;">⏳ পেন্ডিং কন্টাক্ট রিকোয়েস্ট (Pending Approvals)</h2>
-            <p style="font-size:13px; color:#555; margin-bottom:10px;">ইউজারদের সাবমিট করা কন্টাক্ট যাচাই করে অনুমোদন বা বাতিল করুন।</p>
-            <div id="pendingContactsContainer"><p style="text-align: center; color: #777;">লোড হচ্ছে...</p></div>
+        <div class="card" style="border: 2px solid #f59e0b; background: #fffbeb;">
+            <h2 style="color: #b45309; border-color: #fde68a;">⏳ পেন্ডিং কন্টাক্ট রিকোয়েস্ট (Pending Approvals)</h2>
+            <p style="font-size:13.5px; color:#78350f; margin-bottom:12px;">ইউজারদের সাবমিট করা কন্টাক্ট যাচাই করে অনুমোদন বা বাতিল করুন।</p>
+            <div id="pendingContactsContainer"><p style="text-align: center; color: var(--text-muted);">লোড হচ্ছে...</p></div>
         </div>
 
         <div class="card">
@@ -242,13 +698,13 @@
             <label for="facebook">Facebook লিংক (ঐচ্ছিক):</label>
             <input type="text" id="facebook" placeholder="যেমন: https://facebook.com/username">
 
-            <button id="saveBtn" class="btn-primary" onclick="saveContact()">কন্টাক্ট সেভ করুন</button>
-            <button id="cancelBtn" class="btn-cancel" onclick="resetForm()" style="display:none; width: 100%;">ক্যানসেল করুন</button>
+            <button id="saveBtn" class="btn-primary" onclick="saveContact()">💾 কন্টাক্ট সেভ করুন</button>
+            <button id="cancelBtn" class="btn-cancel" onclick="resetForm()" style="display:none; width: 100%;">❌ ক্যানসেল করুন</button>
         </div>
 
         <div class="card">
             <h2>📑 অনুমোদিত সকল কন্টাক্ট তালিকা</h2>
-            <div id="contactsContainer"><p style="text-align: center; color: #777;">লোড হচ্ছে...</p></div>
+            <div id="contactsContainer"><p style="text-align: center; color: var(--text-muted); padding: 14px;">লোড হচ্ছে...</p></div>
         </div>
     </div>
 
@@ -256,7 +712,7 @@
     <div id="pageTerms" class="page-section">
         <div class="card">
             <h2>📜 ব্যবহার নির্দেশিকা ও শর্তাবলী এডিটর</h2>
-            <p style="font-size: 13px; color: #555; margin-bottom: 8px;">অ্যাপের প্রোফাইল পেজের "শর্তাবলী ও নিয়মাবলি" পেজের কনটেন্ট এবং ভিডিও এখান থেকে নিয়ন্ত্রণ করুন।</p>
+            <p style="font-size: 13.5px; color: var(--text-muted); margin-bottom: 12px;">অ্যাপের প্রোফাইল পেজের "শর্তাবলী ও নিয়মাবলি" পেজের কনটেন্ট এবং ভিডিও এখান থেকে নিয়ন্ত্রণ করুন।</p>
 
             <div class="toolbar">
                 <button type="button" class="tool-btn" onclick="insertTagTarget('termsContentInput', '<b>', '</b>')"><b>B</b> গাঢ়</button>
@@ -277,15 +733,15 @@
             <label>লাইভ প্রিভিউ (Live Preview):</label>
             <div id="termsPreviewBox" class="preview-box"><i>এখানে শর্তাবলীর লাইভ প্রিভিউ দেখা যাবে...</i></div>
 
-            <button class="btn-primary" onclick="saveTermsSettings()">শর্তাবলী সেভ করুন</button>
+            <button class="btn-primary" onclick="saveTermsSettings()">💾 শর্তাবলী সেভ করুন</button>
         </div>
     </div>
 
     <!-- PAGE 6: PAYMENT & PLAN SETTINGS -->
     <div id="pagePaymentPlan" class="page-section">
-        <div class="card" style="border: 1px solid #006A4E;">
+        <div class="card" style="border-left: 4px solid var(--primary);">
             <h2>💳 বিকাশ ও নগদ পেমেন্ট গেটওয়ে কনফিগারেশন</h2>
-            <p style="font-size: 13px; color: #555; margin-bottom: 6px;">অ্যাপে চেকআউট পেজের রিয়েলটাইম পেমেন্ট রিকোয়েস্ট চালানোর জন্য গেটওয়ে ক্রেডেনশিয়াল সেভ করুন।</p>
+            <p style="font-size: 13.5px; color: var(--text-muted); margin-bottom: 10px;">অ্যাপে চেকআউট পেজের রিয়েলটাইম পেমেন্ট রিকোয়েস্ট চালানোর জন্য গেটওয়ে ক্রেডেনশিয়াল সেভ করুন।</p>
 
             <label for="gatewayUrlInput">পেমেন্ট গেটওয়ে বেস ইউআরএল (Domain URL):</label>
             <input type="text" id="gatewayUrlInput" placeholder="যেমন: https://pay-p2p.vercel.app">
@@ -299,12 +755,12 @@
             <label for="nagadApiKeyInput">নগদ এপিআই কী (Nagad API Key):</label>
             <input type="text" id="nagadApiKeyInput" placeholder="যেমন: NG-XXXXXXX">
 
-            <button class="btn-primary" onclick="savePaymentConfig()">পেমেন্ট গেটওয়ে সেটিংস সেভ করুন</button>
+            <button class="btn-primary" onclick="savePaymentConfig()">💾 পেমেন্ট গেটওয়ে সেটিংস সেভ করুন</button>
         </div>
 
-        <div class="card">
+        <div class="card" style="border-left: 4px solid #10b981;">
             <h2>🛡️ ভেরিফিকেশন সাবস্ক্রিপশন প্ল্যান ও ডিসকাউন্ট রেট</h2>
-            <p style="font-size: 13px; color: #555; margin-bottom: 8px;">১ মাস, ৬ মাস ও ১ বছরের প্ল্যানের দাম এবং ডিসকাউন্ট পার্সেন্টেজ নির্ধারণ করুন।</p>
+            <p style="font-size: 13.5px; color: var(--text-muted); margin-bottom: 10px;">১ মাস, ৬ মাস ও ১ বছরের প্ল্যানের দাম এবং ডিসকাউন্ট পার্সেন্টেজ নির্ধারণ করুন।</p>
 
             <label for="monthlyPriceInput">১ মাসের মূল দাম (টাকা *):</label>
             <input type="number" id="monthlyPriceInput" oninput="updatePlanCalculationPreview()" placeholder="যেমন: 50">
@@ -316,13 +772,13 @@
             <input type="number" id="discount12mInput" oninput="updatePlanCalculationPreview()" placeholder="যেমন: 30">
 
             <label style="margin-top: 16px;">📊 লাইভ প্রাইস ক্যালকুলেশন প্রিভিউ (অ্যাপে যেমন দেখাবে):</label>
-            <div class="preview-box" style="background: #fdfdfd; min-height: auto;">
-                <p id="preview1M" style="color: #006A4E; font-size: 15px; margin-bottom: 6px; font-weight: bold;">১ মাস: ৳৫০</p>
-                <p id="preview6M" style="color: #212121; font-size: 14px; margin-bottom: 6px;">৬ মাস: <del>৳৩০০</del> <strong>৳২৫৫</strong> (১৫% ছাড়)</p>
-                <p id="preview12M" style="color: #212121; font-size: 14px;">১ বছর: <del>৳৬০০</del> <strong>৳৪২০</strong> (৩০% ছাড়)</p>
+            <div class="preview-box" style="background: #ffffff; min-height: auto; border: 1.5px solid #cbd5e1;">
+                <p id="preview1M" style="color: var(--primary); font-size: 15px; margin-bottom: 6px; font-weight: 700;">১ মাস: ৳৫০</p>
+                <p id="preview6M" style="color: var(--text-main); font-size: 14px; margin-bottom: 6px;">৬ মাস: <del>৳৩০০</del> <strong>৳২৫৫</strong> (১৫% ছাড়)</p>
+                <p id="preview12M" style="color: var(--text-main); font-size: 14px;">১ বছর: <del>৳৬০০</del> <strong>৳৪২০</strong> (৩০% ছাড়)</p>
             </div>
 
-            <button class="btn-primary" onclick="saveVerificationPlans()">প্ল্যান ও ডিসকাউন্ট সেভ করুন</button>
+            <button class="btn-primary" onclick="saveVerificationPlans()">💾 প্ল্যান ও ডিসকাউন্ট সেভ করুন</button>
         </div>
     </div>
 
