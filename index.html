@@ -5,54 +5,409 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>সহায়ক - লালপুর উপজেলা জরুরি ডিজিটাল সেবা</title>
     <link rel="icon" href="flogo.png">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap" rel="stylesheet">
+
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; }
-        body { background: #f0f4f2; color: #212121; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 16px; }
-        .card { background: #ffffff; width: 100%; max-width: 440px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0, 106, 78, 0.12); overflow: hidden; text-align: center; border: 1px solid #e0eae5; }
-        .header-bg { background: linear-gradient(135deg, #F42A41 0%, #006A4E 100%); padding: 36px 20px 24px; color: white; }
-        .logo-img { width: 90px; height: 90px; border-radius: 50%; background: white; padding: 6px; box-shadow: 0 6px 16px rgba(0,0,0,0.15); margin-bottom: 12px; }
-        .title { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
-        .subtitle { font-size: 14px; opacity: 0.92; }
-        .content { padding: 28px 24px; }
-        .badge { display: inline-block; background: #e8f5e9; color: #006A4E; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: bold; margin-bottom: 16px; }
-        .message { font-size: 15px; color: #444; line-height: 1.6; margin-bottom: 24px; }
-        .btn { display: flex; align-items: center; justify-content: center; width: 100%; padding: 14px; border-radius: 12px; font-size: 16px; font-weight: bold; text-decoration: none; cursor: pointer; transition: all 0.2s ease; margin-bottom: 12px; }
-        .btn-app { background: #006A4E; color: white; border: none; box-shadow: 0 4px 12px rgba(0, 106, 78, 0.25); }
-        .btn-app:hover { background-color: #00523d; }
-        .btn-download { background: #ffffff; color: #006A4E; border: 2px solid #006A4E; }
-        .btn-download:hover { background-color: #f0fdf4; }
-        .footer-note { font-size: 12px; color: #888; margin-top: 16px; }
+        :root {
+            --primary: #006A4E;
+            --primary-dark: #004d38;
+            --primary-light: #e6f4ef;
+            --accent: #F42A41;
+            --bg-page: #f8fafc;
+            --text-heading: #0f172a;
+            --text-body: #334155;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Hind Siliguri', 'Plus Jakarta Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-page);
+            color: var(--text-body);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* শীর্ষ ন্যাভিগেশন বার */
+        .navbar {
+            background: #ffffff;
+            border-bottom: 1px solid var(--border-color);
+            padding: 14px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .brand-img {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            object-fit: cover;
+            border: 1px solid var(--border-color);
+        }
+
+        .brand-text h1 {
+            font-size: 19px;
+            font-weight: 700;
+            color: var(--primary);
+            line-height: 1.1;
+        }
+
+        .brand-text p {
+            font-size: 11.5px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .nav-tag {
+            background: var(--primary-light);
+            color: var(--primary);
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 20px;
+        }
+
+        /* হিরো / মূল পেজ কনটেন্ট */
+        .main-wrapper {
+            flex: 1;
+            max-width: 760px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 40px 20px 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .badge-wrapper {
+            margin-bottom: 18px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #ffffff;
+            color: var(--primary);
+            padding: 8px 18px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            border: 1px solid rgba(0, 106, 78, 0.2);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .badge::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--accent);
+        }
+
+        .hero-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-heading);
+            margin-bottom: 12px;
+            line-height: 1.25;
+        }
+
+        .hero-title span {
+            color: var(--primary);
+        }
+
+        .message {
+            font-size: 17px;
+            color: var(--text-body);
+            line-height: 1.6;
+            max-width: 580px;
+            margin-bottom: 36px;
+        }
+
+        .message strong {
+            color: var(--text-heading);
+        }
+
+        /* অ্যাকশন বাটন সেকশন */
+        .action-container {
+            width: 100%;
+            max-width: 480px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-bottom: 40px;
+        }
+
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 16px 24px;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn svg {
+            width: 20px;
+            height: 20px;
+            transition: transform 0.2s ease;
+        }
+
+        /* অ্যাপ ওপেন বাটন */
+        .btn-app {
+            background: var(--primary);
+            color: #ffffff;
+            border: none;
+            box-shadow: 0 10px 22px rgba(0, 106, 78, 0.25);
+        }
+
+        .btn-app:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(0, 106, 78, 0.35);
+        }
+
+        .btn-app:hover svg {
+            transform: translateX(4px);
+        }
+
+        .btn-app:active {
+            transform: scale(0.99);
+        }
+
+        /* ডাউনলোড বাটন */
+        .btn-download {
+            background: #ffffff;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-download:hover {
+            background: var(--primary-light);
+            transform: translateY(-2px);
+        }
+
+        .btn-download:hover svg {
+            transform: translateY(2px);
+        }
+
+        .btn-download:active {
+            transform: scale(0.99);
+        }
+
+        /* ফিচার হাইলাইট সেকশন */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+            gap: 16px;
+            width: 100%;
+            margin-top: 10px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 36px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #ffffff;
+            padding: 14px 18px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            text-align: left;
+        }
+
+        .feature-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: var(--primary-light);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .feature-icon svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .feature-item h3 {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-heading);
+            margin-bottom: 2px;
+        }
+
+        .feature-item p {
+            font-size: 11.5px;
+            color: var(--text-muted);
+        }
+
+        /* ফুটার */
+        .footer {
+            border-top: 1px solid var(--border-color);
+            background: #ffffff;
+            padding: 20px;
+            text-align: center;
+            margin-top: auto;
+        }
+
+        .footer-text {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        @media (max-width: 600px) {
+            .hero-title {
+                font-size: 26px;
+            }
+            .message {
+                font-size: 15px;
+            }
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            .main-wrapper {
+                padding-top: 24px;
+            }
+        }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <div class="header-bg">
-        <img src="flogo.png" alt="সহায়ক লোগো" class="logo-img" onerror="this.src='logo2.png'">
-        <h1 class="title">সহায়ক (Sahayak)</h1>
-        <p class="subtitle">লালপুর উপজেলা জরুরি তথ্য সেবা | ডেভেলপার নূর</p>
+<!-- হেডার / ন্যাভবার -->
+<header class="navbar">
+    <div class="nav-container">
+        <a href="#" class="brand">
+            <img src="flogo.png" alt="সহায়ক লোগো" class="brand-img" onerror="this.src='logo2.png'">
+            <div class="brand-text">
+                <h1>সহায়ক</h1>
+                <p>লালপুর উপজেলা ডিজিটাল সেবা</p>
+            </div>
+        </a>
+        <div class="nav-tag">v1.8 রিলিজ</div>
     </div>
+</header>
 
-    <div class="content">
+<!-- মূল ফুল-পেজ কনটেন্ট -->
+<main class="main-wrapper">
+    
+    <div class="badge-wrapper">
         <div id="typeBadge" class="badge">শেয়ার করা কনটেন্ট</div>
-        <p id="shareMsg" class="message">
-            এই তথ্যটি সহজে এবং পূর্ণাঙ্গভাবে দেখতে <strong>সহায়ক অ্যান্ড্রয়েড অ্যাপে</strong> প্রবেশ করুন।
-        </p>
-
-        <!-- Button 1: Open in App -->
-        <a id="btnOpenApp" href="#" class="btn btn-app">
-            লিঙ্কটি অ্যাপে দেখুন
-        </a>
-
-        <!-- Button 2: Download APK -->
-        <a href="sahayak.apk" download="sahayak.apk" class="btn btn-download">
-            সহায়ক অ্যাপ ডাউনলোড করুন (APK)
-        </a>
-
-        <p class="footer-note">নাটোর জেলার লালপুর উপজেলার নাগরিকদের জন্য নির্মিত</p>
     </div>
-</div>
 
+    <h2 class="hero-title">এক ক্লিকেই লালপুরের <span>জরুরি সেবা</span></h2>
+    
+    <p id="shareMsg" class="message">
+        এই তথ্যটি সহজে এবং পূর্ণাঙ্গভাবে দেখতে <strong>সহায়ক অ্যান্ড্রয়েড অ্যাপে</strong> প্রবেশ করুন।
+    </p>
+
+    <!-- অ্যাকশন বাটনসমূহ -->
+    <div class="action-container">
+        <!-- বাটন ১: সরাসরি অ্যাপে ওপেন -->
+        <a id="btnOpenApp" href="#" class="btn btn-app">
+            <span>লিঙ্কটি অ্যাপে দেখুন</span>
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.3" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+            </svg>
+        </a>
+
+        <!-- বাটন ২: গিটহাব রিলিজ থেকে ডাউনলোড -->
+        <a href="https://github.com/jomidokhol/sahayak-app/releases/tag/1.8" target="_blank" class="btn btn-download">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.3" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+            </svg>
+            <span>সহায়ক অ্যাপ ডাউনলোড করুন (v1.8 APK)</span>
+        </a>
+    </div>
+
+    <!-- অ্যাপের ফিচার হাইলাইটস -->
+    <div class="features-grid">
+        <div class="feature-item">
+            <div class="feature-icon">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                </svg>
+            </div>
+            <div>
+                <h3>জরুরি নম্বর</h3>
+                <p>হাসপাতাল, পুলিশ ও ফায়ার সার্ভিস</p>
+            </div>
+        </div>
+
+        <div class="feature-item">
+            <div class="feature-icon">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
+                </svg>
+            </div>
+            <div>
+                <h3>স্থানীয় সংবাদ</h3>
+                <p>লালপুরের নির্ভরযোগ্য খবর</p>
+            </div>
+        </div>
+
+        <div class="feature-item">
+            <div class="feature-icon">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                </svg>
+            </div>
+            <div>
+                <h3>রক্তদান সেবা</h3>
+                <p>রক্তদাতা খোঁজা ও যোগাযোগ</p>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<!-- ফুটার -->
+<footer class="footer">
+    <p class="footer-text">নাটোর জেলার লালপুর উপজেলার নাগরিকদের সুবিধার্থে নির্মিত • ডেভেলপার নূর</p>
+</footer>
+
+<!-- মূল স্ক্রিপ্ট (১০০% অপরিবর্তিত) -->
 <script>
     const currentPath = window.location.pathname;
     const btnOpenApp = document.getElementById('btnOpenApp');
